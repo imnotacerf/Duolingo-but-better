@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BioQuest — Aprendé Biología</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F4EC;
+    --paper-line:#E2DCC9;
+    --ink:#1E2A1F;
+    --ink-soft:#5B6459;
+    --leaf:#2E7D4F;
+    --leaf-dark:#1D5C37;
+    --leaf-pale:#DCEEDF;
+    --violet:#6C4FA1;
+    --violet-dark:#4E3577;
+    --violet-pale:#E7E0F3;
+    --coral:#E1552C;
+    --coral-dark:#B33F1E;
+    --coral-pale:#FBE0D4;
+    --amber:#C68A1F;
+    --amber-dark:#8F6212;
+    --amber-pale:#F5E7C7;
+    --teal:#1E7A6B;
+    --teal-dark:#125349;
+    --teal-pale:#D7ECE8;
+    --plum:#8C4A6B;
+    --plum-dark:#63304A;
+    --plum-pale:#F0DFE8;
+    --sky:#2E6DA4;
+    --sky-dark:#1F4E78;
+    --sky-pale:#DCE9F5;
+    --white:#FFFFFF;
+    --shadow: 0 4px 0 rgba(30,42,31,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 28px,
+      var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:480px; margin:0 auto; min-height:100vh; position:relative; padding-bottom:24px;}
+
+  h1,h2,h3{font-family:'Fraunces', serif; margin:0; letter-spacing:-0.01em;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  button{font-family:inherit; cursor:pointer; border:none;}
+  button:focus-visible, [tabindex]:focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px 10px;
+    position:sticky; top:0; z-index:20;
+    background:var(--paper);
+    border-bottom:1px solid var(--paper-line);
+  }
+  .stat{display:flex; align-items:center; gap:6px; font-weight:700; font-size:15px;}
+  .stat svg{width:20px; height:20px; flex:none;}
+
+  /* ---------- Home / path screen ---------- */
+  .home-header{padding:22px 20px 6px;}
+  .home-header .eyebrow{
+    font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:var(--ink-soft); font-weight:600;
+  }
+  .home-header h1{font-size:26px; margin-top:4px; color:var(--leaf-dark);}
+  .home-header p.lead{font-size:13.5px; color:var(--ink-soft); margin-top:6px; max-width:38ch; line-height:1.4;}
+
+  /* ---------- Practice / Repaso card ---------- */
+  .practice-card{
+    margin:18px 20px 4px; padding:16px 18px; border-radius:14px;
+    background:linear-gradient(135deg,#4A3D63,#241D33); color:var(--white);
+    box-shadow:var(--shadow);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .practice-card .txt h3{font-size:15px; margin-bottom:3px;}
+  .practice-card .txt p{font-size:11.5px; opacity:0.82; margin:0; line-height:1.4;}
+  .practice-card button{
+    background:var(--white); color:var(--violet-dark); font-weight:700; font-size:12.5px;
+    padding:10px 16px; border-radius:9px; flex:none; box-shadow:0 3px 0 rgba(0,0,0,0.2);
+  }
+  .practice-card button:active{transform:translateY(2px); box-shadow:none;}
+  .practice-card .icon-wrap{width:34px; height:34px; flex:none; opacity:0.9;}
+  .practice-card .icon-wrap svg{width:100%; height:100%; stroke:var(--white); fill:none; stroke-width:1.6;}
+  .practice-locked{
+    margin:18px 20px 4px; padding:14px 18px; border-radius:14px;
+    border:2px dashed var(--paper-line); color:var(--ink-soft); font-size:12.5px; text-align:center; line-height:1.4;
+  }
+
+  .unit-block{margin:26px 0 6px;}
+  .unit-header{
+    margin:0 20px 22px;
+    padding:14px 18px;
+    border-radius:14px;
+    color:var(--white);
+    display:flex; align-items:center; justify-content:space-between;
+    box-shadow:var(--shadow);
+  }
+  .unit-header h2{font-size:18px;}
+  .unit-header .unit-sub{font-size:12px; opacity:0.85; margin-top:2px; font-weight:500;}
+
+  .path{position:relative; padding:6px 0 10px;}
+
+  .node-row{display:flex; justify-content:center; margin:2px 0;}
+  .node-row.offset-left{justify-content:flex-start; padding-left:18%;}
+  .node-row.offset-right{justify-content:flex-end; padding-right:18%;}
+
+  .node{
+    width:74px; height:74px;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    margin:10px 0;
+  }
+  .node button.hex{
+    width:100%; height:100%;
+    clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    transition: transform .12s ease;
+  }
+  .node button.hex:active{transform:translateY(3px);}
+  .node.locked button.hex{background:#D8D3C4; box-shadow:0 4px 0 #BEB8A4; color:#8B8570;}
+  .node.locked button.hex svg{stroke:#8B8570;}
+  .node.current button.hex{animation:pulse 1.8s ease-in-out infinite;}
+  .node-label{
+    position:absolute; top:80px; left:50%; transform:translateX(-50%);
+    font-size:11px; font-weight:600; color:var(--ink-soft); width:110px; text-align:center; line-height:1.25;
+  }
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 4px 0 rgba(30,42,31,0.18), 0 0 0 0 rgba(46,125,79,0.35); }
+    50%{ box-shadow:0 4px 0 rgba(30,42,31,0.18), 0 0 0 10px rgba(46,125,79,0); }
+  }
+  .node svg.icon{width:30px; height:30px; fill:none; stroke:var(--white); stroke-width:1.8;}
+  .node .check{position:absolute; bottom:-4px; right:-2px; width:22px; height:22px; background:var(--amber); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 0 rgba(0,0,0,0.15);}
+  .node .check svg{width:13px; height:13px; stroke:var(--white); stroke-width:3; fill:none;}
+
+  /* ---------- Shared lesson/teach header ---------- */
+  .lesson-header{
+    display:flex; align-items:center; gap:10px; padding:14px 18px;
+    position:sticky; top:0; background:var(--paper); z-index:20; border-bottom:1px solid var(--paper-line);
+  }
+  .exit-btn{background:none; color:var(--ink-soft); font-size:22px; line-height:1; padding:4px;}
+  .progress-track{flex:1; height:12px; background:#E2DCC9; border-radius:8px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--leaf); border-radius:8px; transition:width .35s ease;}
+  .progress-fill.practice-fill{background:var(--violet);}
+  .hearts-mini{display:flex; align-items:center; gap:4px; font-weight:700; color:var(--coral-dark); font-size:14px; flex:none;}
+  .hearts-mini svg{width:18px; height:18px;}
+  .teach-heading-line{flex:1; font-weight:700; font-size:13.5px; color:var(--ink-soft);}
+  .combo-badge{
+    display:flex; align-items:center; gap:3px; background:var(--amber-pale); color:var(--amber-dark);
+    font-weight:700; font-size:12px; padding:4px 8px; border-radius:20px; flex:none; white-space:nowrap;
+  }
+
+  /* ---------- Teach screen ---------- */
+  .teach-wrap{padding:22px 20px 130px;}
+  .q-kicker{font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-soft); font-weight:700; margin-bottom:10px;}
+  .teach-title{font-size:23px; margin-bottom:18px;}
+  .concept{
+    background:var(--white); border:2px solid var(--paper-line); border-radius:14px;
+    padding:16px 18px; margin-bottom:14px; box-shadow:0 3px 0 var(--paper-line);
+  }
+  .concept h3{font-size:15.5px; margin-bottom:8px;}
+  .concept p{font-size:14px; line-height:1.55; color:var(--ink); margin:0 0 8px;}
+  .concept ul{margin:0; padding-left:18px; font-size:13.5px; color:var(--ink-soft); line-height:1.5;}
+  .concept ul li{margin-bottom:4px;}
+  .concept ul li b{color:var(--ink);}
+
+  .question-wrap{padding:28px 22px 130px;}
+  .q-text{font-family:'Fraunces', serif; font-size:22px; font-weight:600; line-height:1.35; color:var(--ink); margin-bottom:22px;}
+  .q-text .blank{text-decoration:underline; text-decoration-style:dashed; text-decoration-color:var(--leaf); text-underline-offset:5px; color:var(--leaf-dark);}
+  .q-type-tag{display:inline-block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700; color:var(--violet-dark); background:var(--violet-pale); padding:3px 9px; border-radius:20px; margin-bottom:10px;}
+
+  .options{display:flex; flex-direction:column; gap:12px;}
+  .option{
+    text-align:left; background:var(--white); border:2px solid var(--paper-line);
+    border-radius:12px; padding:15px 16px; font-size:16px; font-weight:600; color:var(--ink);
+    box-shadow:0 3px 0 var(--paper-line);
+    display:flex; align-items:center; gap:12px;
+    transition: border-color .12s, background .12s, transform .06s;
+    width:100%;
+  }
+  .option:active{transform:translateY(2px);}
+  .option .letter{
+    width:26px; height:26px; border-radius:7px; background:var(--paper); border:2px solid var(--paper-line);
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--ink-soft); flex:none;
+  }
+  .option.selected{border-color:var(--leaf); background:var(--leaf-pale);}
+  .option.selected .letter{background:var(--leaf); border-color:var(--leaf); color:var(--white);}
+  .option.correct{border-color:var(--leaf); background:var(--leaf-pale);}
+  .option.correct .letter{background:var(--leaf); border-color:var(--leaf); color:var(--white);}
+  .option.wrong{border-color:var(--coral); background:var(--coral-pale);}
+  .option.wrong .letter{background:var(--coral); border-color:var(--coral); color:var(--white);}
+  .option[disabled]{cursor:default;}
+
+  .tf-row{display:flex; gap:12px;}
+  .tf-row .option{flex:1; justify-content:center; text-align:center;}
+
+  /* ---------- Match (relacionar) exercise ---------- */
+  .match-hint{font-size:12.5px; color:var(--ink-soft); margin:-10px 0 16px; line-height:1.4;}
+  .match-wrap{display:flex; gap:10px;}
+  .match-col{flex:1; display:flex; flex-direction:column; gap:9px;}
+  .match-item{
+    background:var(--white); border:2px solid var(--paper-line); border-radius:10px;
+    padding:12px 10px; font-size:12.5px; font-weight:600; text-align:center; line-height:1.3;
+    box-shadow:0 3px 0 var(--paper-line); min-height:48px; display:flex; align-items:center; justify-content:center;
+    transition:transform .1s;
+  }
+  .match-item:active{transform:translateY(2px);}
+  .match-item.selected{border-color:var(--sky); background:var(--sky-pale); color:var(--sky-dark);}
+  .match-item.matched{border-color:var(--leaf); background:var(--leaf-pale); color:var(--leaf-dark); opacity:0.55; box-shadow:none;}
+  .match-item.wrong{border-color:var(--coral); background:var(--coral-pale); animation:shake .3s;}
+  .match-item[disabled]{cursor:default;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
+
+  /* ---------- Bottom action bar ---------- */
+  .action-bar{
+    position:fixed; bottom:0; left:0; right:0;
+    max-width:480px; margin:0 auto;
+    background:var(--paper); border-top:1px solid var(--paper-line);
+    padding:14px 22px 20px;
+    z-index:30;
+  }
+  .action-bar.state-correct{background:var(--leaf-pale); border-top-color:var(--leaf);}
+  .action-bar.state-wrong{background:var(--coral-pale); border-top-color:var(--coral);}
+  .feedback-line{display:flex; align-items:center; gap:8px; font-weight:700; margin-bottom:6px; font-size:15px; flex-wrap:wrap;}
+  .feedback-line.correct{color:var(--leaf-dark);}
+  .feedback-line.wrong{color:var(--coral-dark);}
+  .feedback-line .mini-combo{font-size:12px; font-weight:700; color:var(--amber-dark); background:var(--amber-pale); padding:2px 8px; border-radius:20px;}
+  .feedback-explain{font-size:12.5px; color:var(--ink-soft); margin:0 0 10px; line-height:1.4;}
+  .btn-primary{
+    width:100%; padding:15px; border-radius:12px; font-size:15px; font-weight:700;
+    letter-spacing:0.04em; text-transform:uppercase; background:#CFC9B6; color:#8B8570; box-shadow:0 4px 0 #BEB8A4;
+  }
+  .btn-primary.ready{background:var(--leaf); color:var(--white); box-shadow:0 4px 0 var(--leaf-dark);}
+  .btn-primary.ready:active{transform:translateY(3px); box-shadow:0 1px 0 var(--leaf-dark);}
+  .btn-primary.wrong-state{background:var(--coral); color:var(--white); box-shadow:0 4px 0 var(--coral-dark);}
+  .btn-primary.wrong-state:active{transform:translateY(3px); box-shadow:0 1px 0 var(--coral-dark);}
+  .btn-primary.practice-state{background:var(--violet); color:var(--white); box-shadow:0 4px 0 var(--violet-dark);}
+  .btn-primary.practice-state:active{transform:translateY(3px); box-shadow:0 1px 0 var(--violet-dark);}
+
+  /* ---------- Summary / gameover screens ---------- */
+  .center-screen{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 28px; text-align:center;}
+  .center-screen .badge{width:120px; height:120px; margin-bottom:22px;}
+  .center-screen h1{font-size:28px; margin-bottom:8px;}
+  .center-screen p{color:var(--ink-soft); font-size:15px; margin-bottom:26px; max-width:320px; line-height:1.5;}
+  .summary-stats{display:flex; gap:14px; margin-bottom:30px;}
+  .summary-stat{background:var(--white); border:2px solid var(--paper-line); border-radius:12px; padding:14px 20px; min-width:96px;}
+  .summary-stat .num{font-family:'JetBrains Mono', monospace; font-size:22px; font-weight:700; color:var(--leaf-dark);}
+  .summary-stat .lbl{font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-top:2px; font-weight:600;}
+  .wide-btn{width:100%; max-width:320px; padding:16px; border-radius:12px; background:var(--leaf); color:var(--white); font-weight:700; font-size:15px; text-transform:uppercase; letter-spacing:0.04em; box-shadow:0 4px 0 var(--leaf-dark);}
+  .wide-btn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--leaf-dark);}
+  .wide-btn.secondary{background:transparent; color:var(--ink-soft); box-shadow:none; margin-top:12px; text-transform:none; font-weight:600; letter-spacing:0;}
+
+  .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================================
+   PERSISTENCIA
+   Usa el almacenamiento persistente de artefactos (window.storage) para
+   guardar XP, racha y lecciones completadas entre sesiones. Si por algún
+   motivo no está disponible, cae de forma segura a memoria (se pierde al
+   cerrar, pero la app sigue funcionando).
+   ========================================================================= */
+const STORAGE_KEY = 'bioquest-progress-v1';
+const Store = {
+  data: {},
+  get(k, fallback){ return k in this.data ? this.data[k] : fallback; },
+  set(k, v){ this.data[k] = v; this.persist(); },
+  async persist(){
+    try{ if (window.storage) await window.storage.set(STORAGE_KEY, JSON.stringify(this.data), false); }
+    catch(e){ console.warn('No se pudo guardar el progreso', e); }
+  },
+  async load(){
+    try{
+      if (window.storage){
+        const r = await window.storage.get(STORAGE_KEY, false);
+        if (r && r.value) this.data = JSON.parse(r.value);
+      }
+    }catch(e){ /* todavía no hay progreso guardado */ }
+  }
+};
+
+/* ---------------------------- CONTENIDO ---------------------------- */
+const UNITS = [
+  {
+    id:'bases', title:'Bases de la Biología', sub:'Ciencia y funciones vitales', theme:'leaf', icon:'flask',
+    levels:[
+      { title:'Método científico',
+        teach:[
+          { heading:'El método científico', body:'Es el camino ordenado que sigue la ciencia para producir conocimiento confiable: observar un fenómeno, buscar antecedentes, formular una hipótesis comprobable, diseñar un experimento, analizar los datos y sacar conclusiones que aceptan, rechazan o ajustan la hipótesis inicial.' },
+          { heading:'Experimentación', body:'Es la etapa más activa del método: poner a prueba la hipótesis con una prueba controlada.', bullets:[
+            '<b>Variable independiente:</b> la que el investigador manipula (la causa).',
+            '<b>Variable dependiente:</b> la respuesta que se mide (el efecto).',
+            '<b>Grupo control:</b> no recibe el tratamiento; permite comparar.',
+            '<b>Repeticiones:</b> hacen que el resultado sea confiable.'
+          ]},
+          { heading:'Modelo científico', body:'No es una etapa del método, sino un producto del conocimiento ya acumulado: una representación simplificada de la realidad (como el modelo de la doble hélice del ADN). Es siempre provisorio: puede modificarse ante nueva evidencia.' }
+        ],
+        qs:[
+          {type:'mc', q:'¿En qué etapa del método se propone una explicación tentativa y comprobable?', opts:['Observación','Formulación de la hipótesis','Diseño experimental','Conclusiones'], a:1},
+          {type:'tf', q:'El modelo científico es una etapa del método científico.', a:false, explain:'El modelo es un producto del conocimiento acumulado, no una etapa del método.'},
+          {type:'mc', q:'La variable que el investigador manipula deliberadamente es la...', opts:['Dependiente','De control','Independiente','Hipotética'], a:2},
+          {type:'mc', q:'¿Cómo se llama el grupo que no recibe el tratamiento?', opts:['Grupo control','Grupo experimental','Grupo dependiente','Grupo piloto'], a:0},
+          {type:'tf', q:'Un modelo científico puede modificarse si aparece nueva evidencia.', a:true, explain:'Todo modelo es provisorio y puede ajustarse o reemplazarse.'},
+          {type:'fill', q:'La ___ es la variable que responde al cambio y es la que se mide en un experimento.', opts:['variable dependiente','variable independiente','hipótesis','conclusión'], a:0},
+          {type:'match', q:'Relacioná cada término con su definición.', pairs:[
+            ['Hipótesis','Explicación tentativa y comprobable'],
+            ['Variable independiente','La que el investigador manipula'],
+            ['Grupo control','No recibe el tratamiento'],
+            ['Modelo científico','Representación simplificada y provisoria']
+          ]},
+        ]
+      },
+      { title:'Funciones vitales',
+        teach:[
+          { heading:'Las tres funciones vitales', body:'Todo ser vivo cumple tres funciones básicas para mantenerse con vida y perpetuar su especie: nutrición, relación y reproducción. Otras ideas como el crecimiento o la homeostasis no se cuentan aparte — quedan incluidas dentro de estas tres.' },
+          { heading:'Nutrición y relación', body:'La nutrición obtiene materia y energía del medio (incorporación, digestión, absorción, metabolismo, excreción). La relación (o irritabilidad) percibe estímulos y responde a ellos mediante un receptor, un sistema de coordinación y un efector.' },
+          { heading:'Reproducción', body:'Genera nuevos individuos y asegura la continuidad de la especie. No es indispensable para el individuo, pero sí para la especie. Puede ser asexual (un solo progenitor) o sexual (fusión de gametas de dos progenitores).' }
+        ],
+        qs:[
+          {type:'mc', q:'¿Cuáles son las tres funciones vitales clásicas?', opts:['Nutrición, relación y reproducción','Crecimiento, digestión y excreción','Respiración, circulación y relación','Nutrición, homeostasis y evolución'], a:0},
+          {type:'tf', q:'La reproducción es indispensable para la supervivencia del individuo.', a:false, explain:'Es indispensable para la especie, no para el individuo.'},
+          {type:'mc', q:'Percibir estímulos y responder a ellos corresponde a la función de...', opts:['Nutrición','Relación','Reproducción','Digestión'], a:1},
+          {type:'mc', q:'La estructura que ejecuta la respuesta a un estímulo se llama...', opts:['Receptor','Efector','Coordinador','Sensor'], a:1},
+          {type:'tf', q:'El crecimiento suele contarse como una cuarta función vital, aparte de las tres clásicas.', a:false, explain:'El crecimiento queda incluido dentro de la nutrición, no se cuenta aparte.'},
+          {type:'fill', q:'La función que asegura la continuidad de la especie, aunque no sea indispensable para el individuo, es la ___.', opts:['reproducción','nutrición','relación','excreción'], a:0},
+          {type:'match', q:'Relacioná cada función con lo que hace.', pairs:[
+            ['Nutrición','Obtener materia y energía del medio'],
+            ['Relación','Percibir y responder a estímulos'],
+            ['Reproducción','Generar nuevos individuos'],
+            ['Efector','Ejecuta la respuesta al estímulo']
+          ]},
+        ]
+      },
+      { title:'Nutrición autótrofa y heterótrofa',
+        teach:[
+          { heading:'Autótrofa', body:'Sintetiza su propia materia orgánica a partir de sustancias inorgánicas.', bullets:[
+            '<b>Fotoautótrofos:</b> usan luz solar (plantas, algas, cianobacterias).',
+            '<b>Quimioautótrofos:</b> usan reacciones químicas inorgánicas, sin luz (bacterias del azufre).'
+          ]},
+          { heading:'Heterótrofa', body:'Depende de consumir materia orgánica ya elaborada por otros.', bullets:[
+            '<b>Holozoica:</b> ingiere partículas o presas (herbívoros, carnívoros, omnívoros).',
+            '<b>Saprófita:</b> se nutre de materia orgánica muerta (hongos).',
+            '<b>Parásita:</b> vive a expensas de un huésped vivo (ecto- o endoparásito).',
+            '<b>Simbiótica:</b> beneficio mutuo entre dos organismos.'
+          ]}
+        ],
+        qs:[
+          {type:'mc', q:'Los organismos que obtienen energía de la luz y fijan CO₂ son...', opts:['Quimioautótrofos','Fotoautótrofos','Saprófitos','Holozoicos'], a:1},
+          {type:'mc', q:'Las bacterias del azufre que oxidan compuestos inorgánicos para obtener energía son...', opts:['Fotoautótrofas','Quimioautótrofas','Parásitas','Simbióticas'], a:1},
+          {type:'mc', q:'Un hongo que libera enzimas para nutrirse de materia orgánica muerta tiene nutrición...', opts:['Holozoica','Saprófita','Parásita','Fotoautótrofa'], a:1},
+          {type:'tf', q:'Todos los heterótrofos son animales.', a:false, explain:'También son heterótrofos los hongos y muchas bacterias.'},
+          {type:'mc', q:'Un parásito que vive dentro del cuerpo del huésped se llama...', opts:['Ectoparásito','Endoparásito','Saprófito','Simbionte'], a:1},
+          {type:'fill', q:'Los hongos tienen nutrición heterótrofa de tipo ___, porque se alimentan de materia orgánica muerta.', opts:['saprófita','holozoica','parásita','fotoautótrofa'], a:0},
+          {type:'match', q:'Relacioná cada tipo de nutrición con su ejemplo.', pairs:[
+            ['Fotoautótrofos','Usan luz solar (plantas, algas)'],
+            ['Quimioautótrofos','Usan reacciones químicas inorgánicas'],
+            ['Saprófita','Se nutre de materia orgánica muerta'],
+            ['Endoparásito','Vive dentro del huésped']
+          ]},
+        ]
+      },
+      { title:'Niveles de organización',
+        teach:[
+          { heading:'De la célula al organismo', body:'Los niveles de organización van desde lo más simple a lo más complejo: átomo, molécula, organela, célula, tejido, órgano, sistema de órganos y organismo. Cada nivel surge de la combinación e interacción de los niveles anteriores.' },
+          { heading:'La teoría celular', body:'Establece que todos los seres vivos están formados por una o más células, que la célula es la unidad estructural y funcional de la vida, y que toda célula proviene de otra célula preexistente.' },
+          { heading:'Unicelulares y pluricelulares', body:'Los organismos unicelulares (bacterias, protozoos) están formados por una sola célula que cumple todas las funciones vitales. Los pluricelulares tienen células especializadas, agrupadas en tejidos, que a su vez forman órganos y sistemas.' }
+        ],
+        qs:[
+          {type:'mc', q:'¿Cuál es la unidad estructural y funcional de todos los seres vivos?', opts:['La molécula','La célula','El tejido','El órgano'], a:1},
+          {type:'tf', q:'Según la teoría celular, toda célula proviene de otra célula preexistente.', a:true, explain:'Es uno de los tres postulados centrales de la teoría celular.'},
+          {type:'mc', q:'Un grupo de células similares que cumplen una función en común forman un...', opts:['Órgano','Tejido','Sistema','Organismo'], a:1},
+          {type:'mc', q:'Un organismo formado por una sola célula que cumple todas las funciones vitales es...', opts:['Pluricelular','Unicelular','Colonial','Tisular'], a:1},
+          {type:'tf', q:'En los organismos pluricelulares, todas las células son idénticas y cumplen la misma función.', a:false, explain:'Las células pluricelulares se especializan en distintas funciones.'},
+          {type:'fill', q:'El nivel de organización formado por distintos órganos que trabajan juntos para una función es el ___.', opts:['sistema de órganos','tejido','átomo','molécula'], a:0},
+          {type:'match', q:'Relacioná cada nivel con su definición.', pairs:[
+            ['Célula','Unidad estructural y funcional de la vida'],
+            ['Tejido','Grupo de células similares con una función común'],
+            ['Órgano','Formado por distintos tejidos'],
+            ['Teoría celular','Explica el origen y organización de las células']
+          ]},
+        ]
+      },
+      { title:'Clasificación de los seres vivos',
+        teach:[
+          { heading:'¿Por qué clasificar?', body:'La taxonomía ordena la enorme diversidad biológica en categorías, facilitando su estudio y comunicación mediante la nomenclatura binomial (género + especie).' },
+          { heading:'Los reinos', bullets:[
+            '<b>Monera:</b> organismos procariotas (bacterias).',
+            '<b>Protista:</b> eucariotas unicelulares simples (algas, protozoos).',
+            '<b>Fungi:</b> heterótrofos por absorción (hongos).',
+            '<b>Plantae:</b> autótrofos fotosintéticos (plantas).',
+            '<b>Animalia:</b> heterótrofos por ingestión (animales).'
+          ] },
+          { heading:'Nomenclatura binomial', body:'Propuesta por Linneo, asigna a cada especie un nombre científico de dos partes en latín: el género (con mayúscula) y la especie (en minúscula), siempre en cursiva.' }
+        ],
+        qs:[
+          {type:'mc', q:'¿Quién propuso el sistema de nomenclatura binomial?', opts:['Darwin','Linneo','Mendel','Pasteur'], a:1},
+          {type:'mc', q:'El reino formado por organismos procariotas es...', opts:['Protista','Fungi','Monera','Plantae'], a:2},
+          {type:'mc', q:'Los hongos pertenecen al reino...', opts:['Plantae','Fungi','Animalia','Protista'], a:1},
+          {type:'tf', q:'En la nomenclatura binomial, el nombre de la especie se escribe con mayúscula.', a:false, explain:'El género se escribe con mayúscula; la especie, con minúscula.'},
+          {type:'mc', q:'¿Cuál de estos reinos agrupa a los organismos autótrofos fotosintéticos pluricelulares?', opts:['Fungi','Plantae','Monera','Animalia'], a:1},
+          {type:'fill', q:'El sistema de clasificación con nombre científico de dos partes se llama nomenclatura ___.', opts:['binomial','celular','taxonómica','genética'], a:0},
+          {type:'match', q:'Relacioná cada reino con su característica.', pairs:[
+            ['Monera','Organismos procariotas'],
+            ['Protista','Eucariotas unicelulares simples'],
+            ['Fungi','Heterótrofos por absorción'],
+            ['Animalia','Heterótrofos por ingestión']
+          ]},
+        ]
+      },
+    ]
+  },
+  {
+    id:'celula', title:'La Célula', sub:'Estructura, origen y transporte', theme:'violet', icon:'dna',
+    levels:[
+      { title:'Célula eucariota y organelos',
+        teach:[
+          { heading:'Eucariota vs. procariota', body:'La célula eucariota tiene un núcleo verdadero, delimitado por membrana, y organelos membranosos. La procariota (bacterias, arqueas) no tiene núcleo definido ni organelos con membrana propia.' },
+          { heading:'¿Qué es un organelo?', body:'Es una estructura interna especializada en una función. Los <b>membranosos</b> tienen membrana propia (mitocondria, cloroplasto, núcleo, retículo, Golgi, lisosoma); los <b>no membranosos</b> no la tienen (ribosomas, centríolos).' },
+          { heading:'Mitocondria y cloroplasto', body:'La mitocondria produce ATP mediante la respiración celular. El cloroplasto, solo en células vegetales, realiza la fotosíntesis. Ambos tienen doble membrana y ADN propio.' }
+        ],
+        qs:[
+          {type:'mc', q:'¿Cuál es la diferencia principal entre célula eucariota y procariota?', opts:['El tamaño de la pared celular','La presencia de un núcleo verdadero','La presencia de citoplasma','La capacidad de moverse'], a:1},
+          {type:'mc', q:'El organelo encargado de la respiración celular es...', opts:['El cloroplasto','El núcleo','La mitocondria','El lisosoma'], a:2},
+          {type:'mc', q:'El organelo encargado de la fotosíntesis es...', opts:['El cloroplasto','La mitocondria','El Golgi','El retículo'], a:0},
+          {type:'tf', q:'Los ribosomas son organelos membranosos.', a:false, explain:'No tienen membrana propia: son organelos no membranosos.'},
+          {type:'mc', q:'Una célula con pared celular de quitina y sin cloroplastos es...', opts:['Animal','Vegetal','Fúngica','Bacteriana'], a:2},
+          {type:'fill', q:'El organelo que realiza la respiración celular y produce ATP es la ___.', opts:['mitocondria','cloroplasto','ribosoma','vacuola'], a:0},
+          {type:'match', q:'Relacioná cada organelo con su función.', pairs:[
+            ['Mitocondria','Produce ATP'],
+            ['Cloroplasto','Realiza la fotosíntesis'],
+            ['Ribosomas','Organelos no membranosos'],
+            ['Núcleo','Contiene el material genético']
+          ]},
+        ]
+      },
+      { title:'Endosimbiosis',
+        teach:[
+          { heading:'La teoría endosimbiótica', body:'Propuesta principalmente por Lynn Margulis, explica que mitocondrias y cloroplastos se originaron a partir de bacterias englobadas por otra célula, sin ser digeridas. Es una "teoría" en el sentido científico: una explicación muy respaldada por evidencia, no una idea sin comprobar.' },
+          { heading:'Origen de cada organelo', body:'La mitocondria proviene de una <b>bacteria aeróbica</b> englobada; el cloroplasto, de una <b>cianobacteria fotosintética</b> englobada. Con el tiempo dejaron de ser organismos independientes y se volvieron organelos permanentes.' },
+          { heading:'Evidencias', body:'ADN propio circular, doble membrana, ribosomas de tipo procariota y reproducción por fisión binaria, independiente del resto de la célula.' }
+        ],
+        qs:[
+          {type:'mc', q:'¿Quién propuso principalmente la teoría endosimbiótica?', opts:['Charles Darwin','Lynn Margulis','Gregor Mendel','Rosalind Franklin'], a:1},
+          {type:'mc', q:'La mitocondria se originó a partir de una...', opts:['Cianobacteria fotosintética','Bacteria aeróbica','Célula vegetal','Arquea metanogénica'], a:1},
+          {type:'mc', q:'El cloroplasto se originó a partir de una...', opts:['Bacteria aeróbica','Cianobacteria fotosintética','Bacteria anaeróbica','Célula animal'], a:1},
+          {type:'tf', q:'Mitocondrias y cloroplastos tienen ADN propio.', a:true, explain:'Es una de las principales evidencias de la endosimbiosis.'},
+          {type:'mc', q:'¿Cuál de estas NO es evidencia de la endosimbiosis?', opts:['Doble membrana','ADN circular propio','Ausencia total de ribosomas','Fisión binaria'], a:2, explain:'Al contrario: sí tienen ribosomas propios, de tipo procariota.'},
+          {type:'fill', q:'La teoría endosimbiótica explica el origen de las mitocondrias y los ___.', opts:['cloroplastos','ribosomas','núcleos','lisosomas'], a:0},
+          {type:'match', q:'Relacioná cada organelo con su origen bacteriano.', pairs:[
+            ['Mitocondria','Bacteria aeróbica englobada'],
+            ['Cloroplasto','Cianobacteria fotosintética englobada'],
+            ['Lynn Margulis','Propuso la teoría endosimbiótica'],
+            ['ADN circular','Evidencia de la endosimbiosis']
+          ]},
+        ]
+      },
+      { title:'Transporte celular',
+        teach:[
+          { heading:'Endocitosis', body:'La célula incorpora sustancias englobándolas con su membrana. Es transporte activo (gasta ATP).', bullets:[
+            '<b>Fagocitosis:</b> partículas sólidas grandes (pseudópodos, fagosoma).',
+            '<b>Pinocitosis:</b> líquidos y solutos, sin especificidad.',
+            '<b>Mediada por receptores:</b> muy selectiva, reconoce una molécula puntual.'
+          ]},
+          { heading:'Transporte pasivo y activo', body:'El <b>gradiente de concentración</b> es la diferencia de concentración de una sustancia entre dos zonas. El transporte <b>pasivo</b> va a favor del gradiente y no gasta energía (difusión simple, facilitada, ósmosis). El <b>activo</b> va en contra del gradiente y gasta ATP (bomba de sodio-potasio, endocitosis/exocitosis).' }
+        ],
+        qs:[
+          {type:'mc', q:'El proceso que incorpora partículas sólidas grandes se llama...', opts:['Pinocitosis','Fagocitosis','Ósmosis','Exocitosis'], a:1},
+          {type:'mc', q:'El proceso más selectivo, con receptores específicos, es la...', opts:['Fagocitosis','Endocitosis mediada por receptores','Pinocitosis','Difusión facilitada'], a:1},
+          {type:'tf', q:'El transporte activo mueve sustancias a favor de su gradiente de concentración.', a:false, explain:'El transporte activo va en contra del gradiente, por eso gasta energía.'},
+          {type:'mc', q:'La bomba de sodio-potasio es un ejemplo de...', opts:['Difusión simple','Transporte activo','Ósmosis','Difusión facilitada'], a:1},
+          {type:'mc', q:'El gradiente de concentración es...', opts:['La velocidad de una reacción','La diferencia de concentración entre dos zonas','La cantidad de ATP disponible','El tamaño de una célula'], a:1},
+          {type:'tf', q:'La endocitosis requiere gasto de energía (ATP).', a:true, explain:'Es un tipo de transporte activo.'},
+          {type:'fill', q:'El transporte que va en contra del gradiente de concentración y gasta ATP es el transporte ___.', opts:['activo','pasivo','por ósmosis','por difusión simple'], a:0},
+          {type:'match', q:'Relacioná cada proceso de transporte con su definición.', pairs:[
+            ['Fagocitosis','Incorpora partículas sólidas grandes'],
+            ['Pinocitosis','Incorpora líquidos y solutos'],
+            ['Transporte pasivo','A favor del gradiente, sin gasto de energía'],
+            ['Transporte activo','En contra del gradiente, con gasto de ATP']
+          ]},
+        ]
+      },
+      { title:'Ciclo celular: mitosis y meiosis',
+        teach:[
+          { heading:'El ciclo celular', body:'Es la secuencia de etapas que atraviesa una célula entre una división y la siguiente. Se divide en <b>interfase</b> (la célula crece y duplica su ADN) y <b>fase M</b> (ocurre la división celular propiamente dicha).' },
+          { heading:'Mitosis', body:'Es la división que genera dos células hijas genéticamente idénticas entre sí y a la célula original. Permite el crecimiento y la reparación de tejidos.' },
+          { heading:'Meiosis', body:'Es la división que genera cuatro células con la mitad de los cromosomas (gametas), introduciendo variabilidad genética. Es exclusiva de la reproducción sexual.' }
+        ],
+        qs:[
+          {type:'mc', q:'La etapa del ciclo celular en la que se duplica el ADN es la...', opts:['Fase M','Interfase','Meiosis I','Citocinesis'], a:1},
+          {type:'mc', q:'La división que genera dos células hijas genéticamente idénticas es la...', opts:['Meiosis','Mitosis','Gemación','Fisión binaria'], a:1},
+          {type:'mc', q:'La división que genera gametas con la mitad de los cromosomas es la...', opts:['Mitosis','Meiosis','Interfase','Fisión binaria'], a:1},
+          {type:'tf', q:'La meiosis genera dos células hijas genéticamente idénticas entre sí.', a:false, explain:'La meiosis genera cuatro células con variabilidad genética; la mitosis es la que genera células idénticas.'},
+          {type:'tf', q:'La fase M del ciclo celular corresponde a la división celular.', a:true, explain:'La fase M es justamente la etapa en la que ocurre la división.'},
+          {type:'fill', q:'La división que genera cuatro células con la mitad de los cromosomas es la ___.', opts:['meiosis','mitosis','interfase','fisión binaria'], a:0},
+          {type:'match', q:'Relacioná cada etapa o proceso con su descripción.', pairs:[
+            ['Interfase','La célula crece y duplica su ADN'],
+            ['Mitosis','Genera células hijas idénticas'],
+            ['Meiosis','Genera gametas con variabilidad genética'],
+            ['Fase M','Ocurre la división celular']
+          ]},
+        ]
+      },
+      { title:'Membrana celular',
+        teach:[
+          { heading:'Modelo del mosaico fluido', body:'La membrana está formada por una bicapa lipídica con proteínas que se desplazan lateralmente, dándole fluidez. Regula el paso de sustancias y mantiene la identidad de la célula.' },
+          { heading:'Componentes', bullets:[
+            '<b>Fosfolípidos:</b> cabeza hidrofílica y cola hidrofóbica, forman la bicapa.',
+            '<b>Proteínas:</b> integrales y periféricas, cumplen funciones de transporte y reconocimiento.',
+            '<b>Colesterol:</b> regula la fluidez de la membrana.',
+            '<b>Glucocálix:</b> glúcidos que participan en el reconocimiento celular.'
+          ] },
+          { heading:'Permeabilidad selectiva', body:'La membrana es semipermeable: deja pasar algunas sustancias con facilidad y otras no, gracias a canales y transportadores proteicos específicos.' }
+        ],
+        qs:[
+          {type:'mc', q:'El modelo que describe la estructura de la membrana celular se llama...', opts:['Mosaico fluido','Doble hélice','Endosimbiótico','Quimiosmótico'], a:0},
+          {type:'mc', q:'Las moléculas que forman la bicapa de la membrana son...', opts:['Proteínas','Fosfolípidos','Glúcidos','Ácidos nucleicos'], a:1},
+          {type:'tf', q:'El colesterol de la membrana ayuda a regular su fluidez.', a:true, explain:'El colesterol se ubica entre los fosfolípidos y modera la fluidez de la membrana.'},
+          {type:'mc', q:'El conjunto de glúcidos que sobresalen de la membrana y participan en el reconocimiento celular se llama...', opts:['Citoesqueleto','Glucocálix','Matriz','Retículo'], a:1},
+          {type:'tf', q:'La membrana celular es totalmente impermeable a cualquier sustancia.', a:false, explain:'Es semipermeable: deja pasar algunas sustancias y otras no.'},
+          {type:'fill', q:'La membrana celular es ___, deja pasar algunas sustancias y otras no.', opts:['semipermeable','impermeable','totalmente permeable','rígida'], a:0},
+          {type:'match', q:'Relacioná cada componente con su función.', pairs:[
+            ['Fosfolípidos','Forman la bicapa de la membrana'],
+            ['Proteínas','Regulan el paso de sustancias'],
+            ['Colesterol','Regula la fluidez de la membrana'],
+            ['Glucocálix','Participa en el reconocimiento celular']
+          ]},
+        ]
+      },
+      { title:'Núcleo y material genético',
+        teach:[
+          { heading:'El núcleo celular', body:'Está rodeado por una envoltura nuclear con poros, contiene el nucléolo (que produce ARN ribosomal) y la cromatina, que es el ADN asociado a proteínas.' },
+          { heading:'Del ADN al cromosoma', body:'Durante la división celular, la cromatina se condensa y compacta formando los cromosomas, visibles al microscopio. Cada cromosoma tiene dos cromátidas hermanas unidas por el centrómero.' },
+          { heading:'El ADN', body:'Es una molécula en doble hélice compuesta por nucleótidos, portadora de la información genética; contiene los genes que determinan las características hereditarias.' }
+        ],
+        qs:[
+          {type:'mc', q:'El ADN asociado a proteínas, disperso en el núcleo cuando la célula no se divide, se llama...', opts:['Cromosoma','Cromatina','Nucléolo','Centrómero'], a:1},
+          {type:'mc', q:'La estructura que une a las dos cromátidas hermanas de un cromosoma es el...', opts:['Nucléolo','Centrómero','Poro nuclear','Huso'], a:1},
+          {type:'tf', q:'Los cromosomas están siempre condensados, incluso cuando la célula no se está dividiendo.', a:false, explain:'Se condensan solo durante la división celular.'},
+          {type:'mc', q:'El nucléolo es la estructura del núcleo encargada de producir...', opts:['ADN','ARN ribosomal','Proteínas de membrana','Lípidos'], a:1},
+          {type:'mc', q:'El ADN tiene forma de...', opts:['Cadena simple','Doble hélice','Triple hélice','Anillo simple'], a:1},
+          {type:'fill', q:'Durante la división celular, la cromatina se condensa y forma los ___.', opts:['cromosomas','ribosomas','nucléolos','centríolos'], a:0},
+          {type:'match', q:'Relacioná cada estructura con su descripción.', pairs:[
+            ['Cromatina','ADN disperso asociado a proteínas'],
+            ['Cromosoma','Forma condensada del ADN durante la división'],
+            ['Centrómero','Une las dos cromátidas hermanas'],
+            ['Nucléolo','Produce ARN ribosomal']
+          ]},
+        ]
+      },
+    ]
+  },
+  {
+    id:'plantas', title:'Fotosíntesis y Plantas', sub:'Energía, carbono y savia', theme:'amber', icon:'sun',
+    levels:[
+      { title:'ATP, NADPH y glucosa',
+        teach:[
+          { heading:'ATP y NADPH', body:'En la fase luminosa de la fotosíntesis, la luz se transforma en energía química. El <b>ATP</b> es la moneda energética de la célula. El <b>NADPH</b> transporta electrones de alta energía hacia el Ciclo de Calvin.' },
+          { heading:'¿Para qué sirve producir glucosa?', body:'La glucosa permite almacenar energía a largo plazo (a diferencia del ATP/NADPH, que se gastan casi de inmediato), es la fuente de la respiración celular, sirve como materia prima estructural (celulosa) y es la base de la cadena alimentaria.' }
+        ],
+        qs:[
+          {type:'mc', q:'¿Qué molécula transporta electrones de alta energía hacia el Ciclo de Calvin?', opts:['ATP','NADPH','Glucosa','RuBP'], a:1},
+          {type:'mc', q:'El ATP libera energía al romper el enlace entre...', opts:['Dos azúcares','Grupos fosfato','Aminoácidos','Bases nitrogenadas'], a:1},
+          {type:'tf', q:'La glucosa puede almacenarse, a diferencia del ATP y el NADPH.', a:true, explain:'Por eso la glucosa sirve como reserva de energía a largo plazo.'},
+          {type:'mc', q:'¿Cuál NO es una función de la glucosa?', opts:['Reserva de energía','Materia prima estructural','Transportar electrones excitados','Base de la cadena alimentaria'], a:2, explain:'Transportar electrones es función del NADPH, no de la glucosa.'},
+          {type:'mc', q:'El ATP y el NADPH se producen durante la fase...', opts:['Oscura','Luminosa','De regeneración del RuBP',' De reducción'], a:1},
+          {type:'fill', q:'La glucosa, a diferencia del ATP, permite ___ energía a largo plazo.', opts:['almacenar','liberar','transportar','oxidar'], a:0},
+          {type:'match', q:'Relacioná cada molécula con su función.', pairs:[
+            ['ATP','Moneda energética de la célula'],
+            ['NADPH','Transporta electrones de alta energía'],
+            ['Glucosa','Permite almacenar energía a largo plazo'],
+            ['Fase luminosa','Produce ATP y NADPH']
+          ]},
+        ]
+      },
+      { title:'Ciclo de Calvin',
+        teach:[
+          { heading:'Reducir el carbono', body:'El CO₂ está completamente oxidado y tiene muy baja energía. <b>Reducirlo</b> significa agregarle electrones e hidrógenos (aportados por el NADPH, con la energía del ATP) para convertirlo en glucosa, rica en energía.' },
+          { heading:'El Ciclo de Calvin', body:'Ocurre en el estroma del cloroplasto, en tres etapas: fijación del CO₂ sobre la RuBP (enzima RuBisCO), reducción a gliceraldehído-3-fosfato usando ATP y NADPH, y regeneración de la RuBP para que el ciclo continúe.' }
+        ],
+        qs:[
+          {type:'mc', q:'Reducir el carbono significa...', opts:['Quitarle electrones','Agregarle electrones e hidrógenos','Quitarle oxígeno solamente','Convertirlo en agua'], a:1},
+          {type:'mc', q:'La enzima que fija el CO₂ a la RuBP se llama...', opts:['ATP sintasa','RuBisCO','NADPH oxidasa','Clorofilasa'], a:1},
+          {type:'tf', q:'El Ciclo de Calvin ocurre en los tilacoides del cloroplasto.', a:false, explain:'Ocurre en el estroma, no en los tilacoides.'},
+          {type:'mc', q:'¿Qué molécula se regenera al final de cada vuelta del ciclo?', opts:['Glucosa','RuBP','ATP','CO₂'], a:1},
+          {type:'tf', q:'El CO₂ es una molécula rica en energía antes de ser reducida.', a:false, explain:'El CO₂ está completamente oxidado: tiene muy baja energía.'},
+          {type:'fill', q:'El Ciclo de Calvin ocurre en el ___ del cloroplasto.', opts:['estroma','tilacoide','núcleo','citoplasma'], a:0},
+          {type:'match', q:'Relacioná cada elemento del Ciclo de Calvin con su rol.', pairs:[
+            ['RuBisCO','Fija el CO₂ sobre la RuBP'],
+            ['Estroma','Lugar donde ocurre el Ciclo de Calvin'],
+            ['Reducir el carbono','Agregarle electrones e hidrógenos'],
+            ['RuBP','Se regenera al final del ciclo']
+          ]},
+        ]
+      },
+      { title:'Xilema y floema',
+        teach:[
+          { heading:'Xilema', body:'Transporta agua y sales minerales (savia bruta), de forma unidireccional y ascendente. Formado por células muertas. El agua sube gracias a la <b>teoría de la cohesión-tensión</b>: la transpiración genera tensión, y los puentes de hidrógeno mantienen la columna de agua unida.' },
+          { heading:'Floema', body:'Transporta azúcares como la sacarosa (savia elaborada), de forma bidireccional, desde las fuentes hacia los sumideros. Formado por células vivas. Se explica con la <b>teoría del flujo de presión</b>: la diferencia de presión entre fuente y sumidero genera el flujo.' }
+        ],
+        qs:[
+          {type:'mc', q:'El tejido que transporta agua y sales minerales es el...', opts:['Floema','Xilema','Parénquima','Cambium'], a:1},
+          {type:'mc', q:'El tejido que transporta azúcares como la sacarosa es el...', opts:['Xilema','Floema','Epidermis','Meristema'], a:1},
+          {type:'tf', q:'El floema está formado por células muertas.', a:false, explain:'A diferencia del xilema, el floema está formado por células vivas.'},
+          {type:'mc', q:'La teoría que explica el ascenso del agua por el xilema es la de...', opts:['Flujo de presión','Cohesión-tensión','Ósmosis inversa','Endosimbiosis'], a:1},
+          {type:'mc', q:'La teoría que explica el transporte por el floema es la de...', opts:['Cohesión-tensión','Flujo de presión','Difusión facilitada','Bomba de protones'], a:1},
+          {type:'fill', q:'El tejido formado por células vivas que transporta savia elaborada es el ___.', opts:['floema','xilema','parénquima','cambium'], a:0},
+          {type:'match', q:'Relacioná cada tejido o teoría con su descripción.', pairs:[
+            ['Xilema','Transporta agua y sales minerales'],
+            ['Floema','Transporta azúcares como la sacarosa'],
+            ['Cohesión-tensión','Explica el ascenso del agua'],
+            ['Flujo de presión','Explica el transporte por el floema']
+          ]},
+        ]
+      },
+      { title:'Fase luminosa',
+        teach:[
+          { heading:'Dónde ocurre', body:'La fase luminosa ocurre en las membranas de los tilacoides del cloroplasto, donde se encuentran los fotosistemas que absorben la luz.' },
+          { heading:'Fotólisis del agua', body:'La clorofila absorbe la luz y excita electrones. Para reponerlos, se rompe una molécula de agua (fotólisis), liberando electrones, protones (H+) y oxígeno como producto de desecho.' },
+          { heading:'Cadena de transporte de electrones', body:'Los electrones excitados viajan por una cadena de proteínas que bombea protones al interior del tilacoide, generando un gradiente que la ATP sintasa usa para producir ATP; al final, el NADP+ se reduce a NADPH.' }
+        ],
+        qs:[
+          {type:'mc', q:'La fase luminosa de la fotosíntesis ocurre en...', opts:['El estroma','Los tilacoides','La mitocondria','El citoplasma'], a:1},
+          {type:'mc', q:'El oxígeno liberado en la fotosíntesis proviene de la ruptura de...', opts:['CO₂','Glucosa','Agua','ATP'], a:2},
+          {type:'tf', q:'La fotólisis del agua libera electrones, protones y oxígeno.', a:true, explain:'Estos productos permiten reponer electrones y generar el gradiente de protones.'},
+          {type:'mc', q:'La enzima que utiliza el gradiente de protones para producir ATP se llama...', opts:['RuBisCO','ATP sintasa','Clorofilasa','NADPH oxidasa'], a:1},
+          {type:'tf', q:'El NADP+ se reduce a NADPH al final de la cadena de transporte de electrones.', a:true, explain:'El NADPH luego se usa en el Ciclo de Calvin.'},
+          {type:'fill', q:'La ruptura del agua durante la fase luminosa se llama ___ del agua.', opts:['fotólisis','hidrólisis','oxidación','reducción'], a:0},
+          {type:'match', q:'Relacioná cada elemento de la fase luminosa con su rol.', pairs:[
+            ['Tilacoides','Lugar donde ocurre la fase luminosa'],
+            ['Fotólisis del agua','Libera electrones, protones y oxígeno'],
+            ['ATP sintasa','Produce ATP usando el gradiente de protones'],
+            ['NADPH','Se forma al final de la cadena de electrones']
+          ]},
+        ]
+      },
+      { title:'Tejidos vegetales',
+        teach:[
+          { heading:'Tejidos meristemáticos', body:'Formados por células indiferenciadas que se dividen activamente, responsables del crecimiento de la planta; pueden ser apicales (en el extremo de raíz y tallo) o laterales (como el cámbium, que da grosor).' },
+          { heading:'Tejidos permanentes', bullets:[
+            '<b>Dérmico:</b> epidermis, protege la superficie de la planta.',
+            '<b>Fundamental o parénquima:</b> fotosíntesis, reserva y sostén.',
+            '<b>Vascular:</b> xilema y floema, transporte de savia.'
+          ] },
+          { heading:'Crecimiento primario y secundario', body:'El crecimiento primario (en longitud) se debe a los meristemas apicales; el secundario (en grosor) se debe a los meristemas laterales, presente sobre todo en plantas leñosas.' }
+        ],
+        qs:[
+          {type:'mc', q:'Los tejidos formados por células indiferenciadas que se dividen activamente son los...', opts:['Dérmicos','Meristemáticos','Vasculares','Fundamentales'], a:1},
+          {type:'mc', q:'El tejido que protege la superficie externa de la planta es el...', opts:['Vascular','Fundamental','Dérmico','Meristemático'], a:2},
+          {type:'mc', q:'El xilema y el floema forman parte del tejido...', opts:['Dérmico','Fundamental','Vascular','Meristemático'], a:2},
+          {type:'tf', q:'El crecimiento en grosor de una planta se debe a los meristemas apicales.', a:false, explain:'Se debe a los meristemas laterales, como el cámbium.'},
+          {type:'tf', q:'El parénquima puede cumplir funciones de fotosíntesis, reserva o sostén.', a:true, explain:'Es un tejido versátil que cumple varias funciones según su ubicación.'},
+          {type:'fill', q:'El meristema lateral que permite el crecimiento en grosor de la planta se llama ___.', opts:['cámbium','epidermis','parénquima','xilema'], a:0},
+          {type:'match', q:'Relacioná cada tejido vegetal con su función.', pairs:[
+            ['Meristemático','Células indiferenciadas que se dividen'],
+            ['Dérmico','Protege la superficie de la planta'],
+            ['Vascular','Transporta agua y nutrientes'],
+            ['Fundamental','Fotosíntesis, reserva y sostén']
+          ]},
+        ]
+      },
+    ]
+  },
+  {
+    id:'animal', title:'Fisiología Animal', sub:'Reproducción y circulación', theme:'coral', icon:'heart',
+    levels:[
+      { title:'Reproducción asexual',
+        teach:[
+          { heading:'Un solo progenitor, clones idénticos', body:'En la reproducción asexual, un solo progenitor genera descendencia genéticamente idéntica, sin fusión de gametas.', bullets:[
+            '<b>Fisión binaria:</b> división en dos partes iguales (bacterias).',
+            '<b>Gemación:</b> una yema se desprende del progenitor (levaduras, hidras).',
+            '<b>Fragmentación:</b> cada fragmento regenera un individuo (estrellas de mar, planarias).',
+            '<b>Esporulación:</b> producción de esporas resistentes (hongos).'
+          ]}
+        ],
+        qs:[
+          {type:'mc', q:'La fisión binaria es típica de...', opts:['Hongos','Bacterias','Estrellas de mar','Helechos'], a:1},
+          {type:'mc', q:'La gemación consiste en...', opts:['Liberar esporas resistentes','Una yema que se desprende del progenitor','Romperse en fragmentos','Fusionar dos gametas'], a:1},
+          {type:'mc', q:'La fragmentación es característica de...', opts:['Bacterias','Levaduras','Estrellas de mar y planarias','Cianobacterias'], a:2},
+          {type:'mc', q:'La esporulación es típica de...', opts:['Hongos','Mamíferos','Aves','Moluscos'], a:0},
+          {type:'tf', q:'En la reproducción asexual interviene la fusión de gametas de dos progenitores.', a:false, explain:'Interviene un solo progenitor, sin fusión de gametas.'},
+          {type:'fill', q:'La reproducción asexual típica de las bacterias es la ___.', opts:['fisión binaria','gemación','fragmentación','esporulación'], a:0},
+          {type:'match', q:'Relacioná cada tipo de reproducción asexual con su ejemplo.', pairs:[
+            ['Fisión binaria','División en dos partes iguales'],
+            ['Gemación','Una yema se desprende del progenitor'],
+            ['Fragmentación','Cada fragmento regenera un individuo'],
+            ['Esporulación','Producción de esporas resistentes']
+          ]},
+        ]
+      },
+      { title:'Sistema circulatorio',
+        teach:[
+          { heading:'Con y sin sistema circulatorio', body:'Poríferos, cnidarios y platelmintos no tienen sistema circulatorio: distribuyen sustancias por difusión directa. A partir de cierta complejidad aparece un sistema con líquido circulante, órgano impulsor y, en general, vasos.' },
+          { heading:'Abierto vs. cerrado', body:'En el <b>abierto</b> (artrópodos, moluscos) la hemolinfa sale de los vasos y baña los tejidos. En el <b>cerrado</b> (anélidos, cefalópodos, vertebrados) la sangre circula siempre dentro de vasos.' },
+          { heading:'Simple vs. doble, completa vs. incompleta', body:'La circulación <b>simple</b> tiene un solo circuito (peces); la <b>doble</b>, dos circuitos, pulmonar y sistémico (resto de vertebrados terrestres). Es <b>incompleta</b> si la sangre oxigenada y no oxigenada se mezclan en el corazón; <b>completa</b> si no se mezclan.' }
+        ],
+        qs:[
+          {type:'mc', q:'¿Cuáles de estos animales NO tienen sistema circulatorio?', opts:['Aves','Poríferos y cnidarios','Mamíferos','Anélidos'], a:1},
+          {type:'mc', q:'En un sistema circulatorio abierto, la hemolinfa...', opts:['Nunca sale de los vasos','Sale de los vasos y baña los tejidos','Solo circula por el corazón','Se filtra en los riñones'], a:1},
+          {type:'mc', q:'La circulación con un solo circuito se llama...', opts:['Doble','Simple','Completa','Abierta'], a:1},
+          {type:'tf', q:'Los anfibios tienen circulación doble y completa.', a:false, explain:'Tienen circulación doble pero incompleta, porque su ventrículo único mezcla la sangre.'},
+          {type:'mc', q:'La circulación cerrada es típica de...', opts:['Artrópodos','Moluscos (mayoría)','Vertebrados','Insectos'], a:2},
+          {type:'fill', q:'En los peces, la circulación es de tipo ___, con un solo circuito.', opts:['simple','doble','abierta','incompleta y doble'], a:0},
+          {type:'match', q:'Relacioná cada tipo de circulación con su descripción.', pairs:[
+            ['Sistema abierto','La hemolinfa baña los tejidos'],
+            ['Sistema cerrado','La sangre circula siempre dentro de vasos'],
+            ['Circulación simple','Un solo circuito'],
+            ['Circulación doble','Dos circuitos, pulmonar y sistémico']
+          ]},
+        ]
+      },
+      { title:'Tipos de corazón',
+        teach:[
+          { heading:'Según el número de cavidades', body:'El número de cavidades del corazón explica si hay o no mezcla de sangre.', bullets:[
+            '<b>Bicameral (2 cavidades):</b> 1 aurícula + 1 ventrículo. Exclusivo de los peces.',
+            '<b>Tricameral (3 cavidades):</b> 2 aurículas + 1 ventrículo. Anfibios y la mayoría de los reptiles.',
+            '<b>Tetracameral (4 cavidades):</b> 2 aurículas + 2 ventrículos separados. Aves, mamíferos y cocodrilos.'
+          ]},
+          { heading:'A más cavidades, menos mezcla', body:'A medida que aumentan las cavidades separadas, la sangre oxigenada y no oxigenada se mezcla menos, haciendo la circulación más eficiente.' }
+        ],
+        qs:[
+          {type:'mc', q:'Un corazón con 2 cavidades (bicameral) es propio de...', opts:['Peces','Anfibios','Aves','Mamíferos'], a:0},
+          {type:'mc', q:'Un corazón con 4 cavidades completamente separadas es propio de...', opts:['Peces','Anfibios','Reptiles (excepto cocodrilos)','Aves y mamíferos'], a:3},
+          {type:'mc', q:'¿Cuántas aurículas y ventrículos tiene un corazón tricameral?', opts:['1 aurícula, 1 ventrículo','2 aurículas, 1 ventrículo','2 aurículas, 2 ventrículos','1 aurícula, 2 ventrículos'], a:1},
+          {type:'tf', q:'Los cocodrilos, entre los reptiles, tienen corazón tetracameral.', a:true, explain:'Son la excepción entre los reptiles: su tabique ventricular está completo.'},
+          {type:'tf', q:'A más cavidades separadas, más se mezcla la sangre oxigenada y no oxigenada.', a:false, explain:'Es al revés: a más cavidades separadas, menos mezcla de sangre.'},
+          {type:'fill', q:'El corazón de los peces tiene ___ cavidades: una aurícula y un ventrículo.', opts:['2','3','4','5'], a:0},
+          {type:'match', q:'Relacioná cada tipo de corazón con su estructura.', pairs:[
+            ['Bicameral','1 aurícula + 1 ventrículo'],
+            ['Tricameral','2 aurículas + 1 ventrículo'],
+            ['Tetracameral','2 aurículas + 2 ventrículos'],
+            ['Cocodrilos','Reptiles con corazón tetracameral']
+          ]},
+        ]
+      },
+      { title:'Reproducción sexual animal',
+        teach:[
+          { heading:'Fecundación', body:'La reproducción sexual implica la fusión de gametas (óvulo y espermatozoide); puede ser externa (fuera del cuerpo, en el agua, típica de peces y anfibios) o interna (dentro del cuerpo de la hembra, típica de reptiles, aves y mamíferos).' },
+          { heading:'Según el desarrollo del embrión', bullets:[
+            '<b>Ovíparos:</b> el embrión se desarrolla en un huevo fuera del cuerpo materno (aves, la mayoría de los reptiles).',
+            '<b>Vivíparos:</b> el embrión se desarrolla dentro del cuerpo materno y recibe nutrientes de la madre (la mayoría de los mamíferos).',
+            '<b>Ovovivíparos:</b> el huevo se desarrolla y eclosiona dentro del cuerpo materno, sin conexión placentaria (algunos tiburones y víboras).'
+          ] },
+          { heading:'Ventaja de la reproducción sexual', body:'Al combinar material genético de dos progenitores, genera variabilidad genética en la descendencia, lo que favorece la adaptación de la especie ante cambios ambientales.' }
+        ],
+        qs:[
+          {type:'mc', q:'La fecundación que ocurre fuera del cuerpo de la hembra se llama...', opts:['Interna','Externa','Ovovivípara','Asexual'], a:1},
+          {type:'mc', q:'Los animales cuyo embrión se desarrolla dentro de un huevo fuera del cuerpo materno son...', opts:['Vivíparos','Ovíparos','Ovovivíparos','Asexuados'], a:1},
+          {type:'mc', q:'La mayoría de los mamíferos tienen desarrollo...', opts:['Ovíparo','Vivíparo','Ovovivíparo','Por gemación'], a:1},
+          {type:'tf', q:'En los animales ovovivíparos, el embrión recibe nutrientes de la madre a través de una placenta.', a:false, explain:'Se desarrolla dentro del cuerpo materno pero sin conexión placentaria, nutriéndose del huevo.'},
+          {type:'tf', q:'La reproducción sexual genera variabilidad genética en la descendencia.', a:true, explain:'Al combinar material genético de dos progenitores, aumenta la variabilidad.'},
+          {type:'fill', q:'Los animales cuyo embrión se desarrolla dentro del cuerpo materno, nutriéndose de él, son ___.', opts:['vivíparos','ovíparos','ovovivíparos','asexuados'], a:0},
+          {type:'match', q:'Relacioná cada tipo de reproducción con su descripción.', pairs:[
+            ['Fecundación externa','Ocurre fuera del cuerpo de la hembra'],
+            ['Ovíparos','Se desarrollan en un huevo externo'],
+            ['Vivíparos','Se desarrollan dentro de la madre'],
+            ['Ovovivíparos','Huevo eclosiona dentro del cuerpo materno']
+          ]},
+        ]
+      },
+      { title:'Sistema respiratorio',
+        teach:[
+          { heading:'Intercambio gaseoso', body:'Todos los animales necesitan incorporar oxígeno y eliminar dióxido de carbono; el tipo de estructura respiratoria depende del ambiente en que viven.' },
+          { heading:'Tipos de respiración', bullets:[
+            '<b>Cutánea:</b> a través de la piel húmeda (lombrices, algunos anfibios).',
+            '<b>Branquial:</b> mediante branquias que extraen oxígeno del agua (peces, muchos moluscos).',
+            '<b>Traqueal:</b> mediante tráqueas que llevan aire directamente a las células (insectos).',
+            '<b>Pulmonar:</b> mediante pulmones, propia de los vertebrados terrestres.'
+          ] },
+          { heading:'Eficiencia del intercambio', body:'Cuanto mayor es la superficie de contacto entre el medio y la sangre u otros tejidos, más eficiente es el intercambio gaseoso; por eso branquias y pulmones tienen estructuras muy plegadas o ramificadas.' }
+        ],
+        qs:[
+          {type:'mc', q:'El intercambio gaseoso a través de la piel húmeda se llama respiración...', opts:['Branquial','Traqueal','Cutánea','Pulmonar'], a:2},
+          {type:'mc', q:'Los insectos respiran mediante un sistema de...', opts:['Branquias','Tráqueas','Pulmones','Piel húmeda'], a:1},
+          {type:'mc', q:'Los peces extraen el oxígeno del agua mediante...', opts:['Pulmones','Tráqueas','Branquias','Piel'], a:2},
+          {type:'tf', q:'La respiración pulmonar es propia de los vertebrados terrestres.', a:true, explain:'Los pulmones son la estructura respiratoria típica de los vertebrados que viven fuera del agua.'},
+          {type:'tf', q:'Cuanto menor es la superficie de intercambio, más eficiente es la respiración.', a:false, explain:'Es al revés: a mayor superficie de contacto, mayor eficiencia en el intercambio gaseoso.'},
+          {type:'fill', q:'Los insectos incorporan oxígeno mediante un sistema de ___ que lleva el aire directamente a las células.', opts:['tráqueas','branquias','pulmones','alvéolos'], a:0},
+          {type:'match', q:'Relacioná cada tipo de respiración con su descripción.', pairs:[
+            ['Respiración cutánea','A través de la piel húmeda'],
+            ['Respiración branquial','Mediante branquias en el agua'],
+            ['Respiración traqueal','Mediante tráqueas, en insectos'],
+            ['Respiración pulmonar','Mediante pulmones, vertebrados terrestres']
+          ]},
+        ]
+      },
+    ]
+  },
+  {
+    id:'tierra', title:'Planeta Tierra y Energía', sub:'Materia, geosfera, agua y aire', theme:'teal', icon:'globe',
+    levels:[
+      { title:'Materia y energía',
+        teach:[
+          { heading:'La materia', body:'Todo lo que nos rodea está formado por materia, cuya unidad básica es el <b>átomo</b>. Los átomos se combinan formando moléculas, que a su vez forman los distintos niveles de organización de la materia.' },
+          { heading:'Tipos de energía', body:'La <b>energía cinética</b> es la asociada al movimiento; la <b>energía potencial</b>, a la posición o el estado de un cuerpo. Ambas pueden manifestarse como energía térmica, eléctrica, química, nuclear o luminosa.' },
+          { heading:'Fuentes de energía', body:'Las <b>renovables</b> (solar, eólica, hidráulica, biomasa) se regeneran naturalmente; las <b>no renovables</b> (petróleo, carbón, gas, energía nuclear) existen en cantidad limitada y tardan millones de años en formarse.' }
+        ],
+        qs:[
+          {type:'mc', q:'La energía asociada al movimiento de un cuerpo se llama...', opts:['Potencial','Cinética','Térmica','Nuclear'], a:1},
+          {type:'mc', q:'La unidad básica que compone toda la materia es...', opts:['La célula','El átomo','La molécula','El compuesto'], a:1},
+          {type:'mc', q:'¿Cuál de estas es una fuente de energía renovable?', opts:['Petróleo','Carbón','Solar','Gas natural'], a:2},
+          {type:'tf', q:'Los combustibles fósiles son fuentes de energía renovable.', a:false, explain:'Son no renovables: existen en cantidad limitada y tardan millones de años en formarse.'},
+          {type:'mc', q:'La energía almacenada según la posición o el estado de un cuerpo es la energía...', opts:['Cinética','Potencial','Eléctrica','Luminosa'], a:1},
+          {type:'fill', q:'El petróleo y el carbón son fuentes de energía ___.', opts:['no renovable','renovable','solar','eólica'], a:0},
+          {type:'match', q:'Relacioná cada concepto con su definición.', pairs:[
+            ['Energía cinética','Asociada al movimiento'],
+            ['Energía potencial','Asociada a la posición o estado'],
+            ['Renovables','Se regeneran naturalmente'],
+            ['No renovables','Cantidad limitada, tardan millones de años']
+          ]},
+        ]
+      },
+      { title:'Geosfera: rocas y suelo',
+        teach:[
+          { heading:'Procesos endógenos y exógenos', body:'Los <b>procesos endógenos</b> se originan dentro de la Tierra (volcanismo, sismos, formación de montañas). Los <b>procesos exógenos</b> son causados por agentes externos como el viento, el agua y la temperatura (erosión, meteorización).' },
+          { heading:'Tipos de rocas', body:'Las <b>ígneas</b> se forman por enfriamiento del magma; las <b>sedimentarias</b>, por acumulación y compactación de sedimentos; las <b>metamórficas</b>, por transformación de otras rocas debido a presión y temperatura.' },
+          { heading:'El suelo', body:'Se forma por la meteorización de la roca madre combinada con materia orgánica. Su textura y porosidad determinan su capacidad de retener agua y aire, algo clave para la vida vegetal.' }
+        ],
+        qs:[
+          {type:'mc', q:'Los procesos que se originan dentro de la Tierra (volcanes, sismos) se llaman...', opts:['Exógenos','Endógenos','Atmosféricos','Erosivos'], a:1},
+          {type:'mc', q:'Los procesos causados por agentes externos como el viento y el agua se llaman...', opts:['Endógenos','Exógenos','Internos','Magmáticos'], a:1},
+          {type:'mc', q:'Las rocas formadas por el enfriamiento del magma son las...', opts:['Sedimentarias','Metamórficas','Ígneas','Orgánicas'], a:2},
+          {type:'mc', q:'Las rocas formadas por presión y temperatura sobre otras rocas son las...', opts:['Ígneas','Metamórficas','Sedimentarias','Volcánicas'], a:1},
+          {type:'tf', q:'El suelo se forma únicamente por la meteorización de la roca, sin materia orgánica.', a:false, explain:'El suelo se forma combinando meteorización de la roca madre con materia orgánica.'},
+          {type:'fill', q:'Las rocas formadas por acumulación y compactación de sedimentos son las ___.', opts:['sedimentarias','ígneas','metamórficas','volcánicas'], a:0},
+          {type:'match', q:'Relacioná cada proceso o roca con su descripción.', pairs:[
+            ['Procesos endógenos','Se originan dentro de la Tierra'],
+            ['Procesos exógenos','Causados por agentes externos'],
+            ['Rocas ígneas','Se forman por enfriamiento del magma'],
+            ['Rocas metamórficas','Se forman por presión y temperatura']
+          ]},
+        ]
+      },
+      { title:'Hidrosfera y atmósfera',
+        teach:[
+          { heading:'La hidrosfera', body:'La mayor parte del agua de la Tierra es <b>agua salada</b> (océanos, cerca del 97%); el resto es agua dulce (hielo, ríos, lagos, agua subterránea). El <b>ciclo del agua</b> incluye evaporación, condensación y precipitación.' },
+          { heading:'La atmósfera', body:'Se organiza en capas: la <b>troposfera</b> (donde ocurre el clima), la <b>estratosfera</b> (con la capa de ozono, que filtra la radiación UV), la mesosfera y la termosfera.' },
+          { heading:'Efecto invernadero y huella de carbono', body:'El efecto invernadero es un fenómeno natural que mantiene la temperatura del planeta; el problema es su intensificación por la actividad humana, medida a través de la huella de carbono.' }
+        ],
+        qs:[
+          {type:'mc', q:'La mayor parte del agua de la Tierra es...', opts:['Agua dulce','Agua salada (océanos)','Hielo','Agua subterránea'], a:1},
+          {type:'mc', q:'La capa de la atmósfera donde ocurren los fenómenos climáticos es la...', opts:['Estratosfera','Troposfera','Mesosfera','Termosfera'], a:1},
+          {type:'mc', q:'La capa que nos protege de la radiación ultravioleta es la capa de...', opts:['Ozono','Nitrógeno','Dióxido de carbono','Hidrógeno'], a:0},
+          {type:'tf', q:'El efecto invernadero es siempre perjudicial y no existe de forma natural.', a:false, explain:'Es un fenómeno natural necesario; el problema es su intensificación por la actividad humana.'},
+          {type:'mc', q:'El ciclo del agua incluye evaporación, condensación y...', opts:['Sedimentación','Precipitación','Combustión','Fotosíntesis'], a:1},
+          {type:'fill', q:'La capa de la atmósfera que contiene la capa de ozono es la ___.', opts:['estratosfera','troposfera','mesosfera','termosfera'], a:0},
+          {type:'match', q:'Relacioná cada concepto con su descripción.', pairs:[
+            ['Troposfera','Donde ocurre el clima'],
+            ['Estratosfera','Contiene la capa de ozono'],
+            ['Efecto invernadero','Mantiene la temperatura del planeta'],
+            ['Huella de carbono','Mide el impacto humano en el clima']
+          ]},
+        ]
+      },
+      { title:'Transformaciones de la energía',
+        teach:[
+          { heading:'Principio de conservación', body:'La energía no se crea ni se destruye, solo se transforma de una forma en otra (primera ley de la termodinámica); por ejemplo, la energía química de un alimento se transforma en energía cinética al moverse un músculo.' },
+          { heading:'Degradación de la energía', body:'En cada transformación, una parte de la energía se disipa como calor y deja de estar disponible para realizar trabajo (segunda ley de la termodinámica); por eso ningún proceso de transformación es 100% eficiente.' },
+          { heading:'Ejemplos cotidianos', bullets:[
+            'Una central hidroeléctrica transforma energía potencial del agua en energía eléctrica.',
+            'Un panel solar transforma energía luminosa en energía eléctrica.',
+            'El cuerpo humano transforma energía química de los alimentos en energía térmica y mecánica.'
+          ] }
+        ],
+        qs:[
+          {type:'mc', q:'La ley que establece que la energía no se crea ni se destruye, solo se transforma, es la...', opts:['Primera ley de la termodinámica','Segunda ley de la termodinámica','Ley de la gravedad','Ley de conservación de la masa'], a:0},
+          {type:'tf', q:'Todo proceso de transformación de energía es 100% eficiente.', a:false, explain:'Siempre se pierde parte de la energía como calor.'},
+          {type:'mc', q:'Una central hidroeléctrica transforma energía potencial del agua en energía...', opts:['Química','Eléctrica','Nuclear','Luminosa'], a:1},
+          {type:'mc', q:'La ley que explica que parte de la energía se disipa como calor en cada transformación es la...', opts:['Primera ley de la termodinámica','Segunda ley de la termodinámica','Ley de Mendel','Ley de la gravitación'], a:1},
+          {type:'tf', q:'Un panel solar transforma energía luminosa en energía eléctrica.', a:true, explain:'Es un ejemplo cotidiano de transformación de energía.'},
+          {type:'fill', q:'En cada transformación de energía, una parte se pierde en forma de ___.', opts:['calor','materia','luz siempre','sonido siempre'], a:0},
+          {type:'match', q:'Relacioná cada concepto o ejemplo con su descripción.', pairs:[
+            ['Primera ley de la termodinámica','La energía no se crea ni se destruye'],
+            ['Segunda ley de la termodinámica','Parte de la energía se disipa como calor'],
+            ['Central hidroeléctrica','Transforma energía potencial en eléctrica'],
+            ['Cuerpo humano','Transforma energía química en térmica y mecánica']
+          ]},
+        ]
+      },
+      { title:'Recursos naturales y sustentabilidad',
+        teach:[
+          { heading:'Recursos naturales', body:'Son los elementos de la naturaleza que el ser humano utiliza para satisfacer sus necesidades; se clasifican en renovables (se regeneran, como el agua o el bosque) y no renovables (se agotan, como los minerales o los combustibles fósiles).' },
+          { heading:'Sobreexplotación', body:'Ocurre cuando un recurso se extrae más rápido de lo que puede regenerarse, agotándolo o degradándolo; incluso los recursos renovables pueden volverse no renovables si se sobreexplotan.' },
+          { heading:'Desarrollo sustentable', body:'Es el desarrollo que satisface las necesidades actuales sin comprometer la capacidad de las generaciones futuras de satisfacer las propias; busca equilibrar lo económico, lo social y lo ambiental.' }
+        ],
+        qs:[
+          {type:'mc', q:'Los recursos que se agotan y no se regeneran a corto plazo se llaman...', opts:['Renovables','No renovables','Inagotables','Biodegradables'], a:1},
+          {type:'tf', q:'Un recurso renovable no puede agotarse nunca, sin importar cuánto se explote.', a:false, explain:'Si se sobreexplota, un recurso renovable puede agotarse igualmente.'},
+          {type:'mc', q:'Extraer un recurso más rápido de lo que puede regenerarse se llama...', opts:['Reciclaje','Sobreexplotación','Reforestación','Conservación'], a:1},
+          {type:'mc', q:'El desarrollo que satisface necesidades actuales sin comprometer a las generaciones futuras se llama desarrollo...', opts:['Acelerado','Sustentable','Industrial','Lineal'], a:1},
+          {type:'tf', q:'El desarrollo sustentable busca equilibrar lo económico, lo social y lo ambiental.', a:true, explain:'Ese equilibrio es su principio central.'},
+          {type:'fill', q:'Un bosque es un ejemplo de recurso natural ___, porque puede regenerarse.', opts:['renovable','no renovable','inagotable','artificial'], a:0},
+          {type:'match', q:'Relacioná cada concepto con su descripción.', pairs:[
+            ['Recurso renovable','Puede regenerarse (agua, bosque)'],
+            ['Recurso no renovable','Se agota (minerales, petróleo)'],
+            ['Sobreexplotación','Extraer más rápido de lo que se regenera'],
+            ['Desarrollo sustentable','Equilibra economía, sociedad y ambiente']
+          ]},
+        ]
+      },
+    ]
+  },
+  {
+    id:'evolucion', title:'Origen de la Vida y Evolución', sub:'De la biogénesis a Darwin', theme:'plum', icon:'branch',
+    levels:[
+      { title:'Origen de la vida',
+        teach:[
+          { heading:'Tres teorías sobre el origen de la vida', body:'La <b>teoría creacionista</b> sostiene que un ser superior creó la vida tal como es. La <b>teoría de la generación espontánea</b> proponía que la vida surge de la materia inerte de forma espontánea. La <b>teoría de la panspermia</b> plantea que la vida (o sus componentes) llegó desde el espacio exterior.' },
+          { heading:'La refutación de la generación espontánea', body:'Experimentos como los de Redi y, más tarde, Pasteur, refutaron la generación espontánea: demostraron que la vida solo surge a partir de vida preexistente.' }
+        ],
+        qs:[
+          {type:'mc', q:'La teoría que sostiene que la vida surgió de la materia inerte de forma espontánea es la...', opts:['Creacionista','Generación espontánea','Panspermia','Sintética'], a:1},
+          {type:'mc', q:'La teoría que propone que la vida llegó desde el espacio exterior es la...', opts:['Panspermia','Creacionista','Generación espontánea','De Lamarck'], a:0},
+          {type:'mc', q:'La teoría que sostiene que un ser superior creó la vida tal como es se llama...', opts:['Panspermia','Generación espontánea','Creacionista','Darwinista'], a:2},
+          {type:'tf', q:'La teoría de la generación espontánea fue refutada experimentalmente.', a:true, explain:'Experimentos como los de Redi y Pasteur demostraron que la vida solo surge de vida preexistente.'},
+          {type:'mc', q:'¿Cuál de estas NO es una teoría sobre el origen de la vida?', opts:['Creacionista','Panspermia','Generación espontánea','Teoría sintética de la evolución'], a:3, explain:'La teoría sintética explica la evolución de las especies, no el origen de la vida.'},
+          {type:'fill', q:'Redi y Pasteur refutaron experimentalmente la teoría de la ___.', opts:['generación espontánea','panspermia','selección natural','endosimbiosis'], a:0},
+          {type:'match', q:'Relacioná cada teoría o experimento con su idea central.', pairs:[
+            ['Creacionismo','Un ser superior creó la vida'],
+            ['Generación espontánea','La vida surge de la materia inerte'],
+            ['Panspermia','La vida llegó desde el espacio'],
+            ['Pasteur','Refutó la generación espontánea']
+          ]},
+        ]
+      },
+      { title:'Teorías evolucionistas',
+        teach:[
+          { heading:'Lamarck', body:'Proponía la herencia de los caracteres adquiridos: los cambios que un individuo desarrolla durante su vida (por uso o desuso de un órgano) se transmitirían a su descendencia.' },
+          { heading:'Darwin', body:'Propuso la <b>selección natural</b> como mecanismo central de la evolución: existe variabilidad entre los individuos, y los mejor adaptados al ambiente tienen más probabilidades de sobrevivir y reproducirse.' },
+          { heading:'Teoría sintética', body:'Combina la selección natural de Darwin con los aportes de la genética moderna (mutación, deriva génica, flujo génico), explicando el origen de la variabilidad que Darwin no podía explicar por sí solo.' }
+        ],
+        qs:[
+          {type:'mc', q:'Lamarck proponía que los caracteres adquiridos durante la vida de un individuo...', opts:['Desaparecen sin dejar rastro','Se heredan a la descendencia','Solo afectan a otras especies','Se transforman en mutaciones'], a:1},
+          {type:'mc', q:'El mecanismo central de la teoría de Darwin es...', opts:['La herencia de caracteres adquiridos','La selección natural','La generación espontánea','La panspermia'], a:1},
+          {type:'mc', q:'La teoría que combina la selección natural con la genética moderna es la...', opts:['Teoría de Lamarck','Teoría creacionista','Teoría sintética de la evolución','Teoría de la panspermia'], a:2},
+          {type:'tf', q:'Darwin conocía las leyes de la genética de Mendel cuando formuló su teoría.', a:false, explain:'Los trabajos de Mendel fueron ignorados durante décadas; Darwin no los conocía.'},
+          {type:'mc', q:'Según Darwin, sobreviven y se reproducen con más éxito los individuos...', opts:['Más grandes','Mejor adaptados al ambiente','Más jóvenes','Con más mutaciones'], a:1},
+          {type:'fill', q:'El mecanismo central de la teoría de Darwin es la ___ natural.', opts:['selección','generación','herencia','panspermia'], a:0},
+          {type:'match', q:'Relacioná cada teoría con su idea central.', pairs:[
+            ['Lamarck','Herencia de los caracteres adquiridos'],
+            ['Darwin','Selección natural'],
+            ['Teoría sintética','Combina selección natural y genética'],
+            ['Variabilidad','Diferencias entre individuos de una población']
+          ]},
+        ]
+      },
+      { title:'Biodiversidad',
+        teach:[
+          { heading:'¿Qué es la biodiversidad?', body:'Es la variedad de formas de vida en un lugar determinado, medida en distintos niveles: diversidad genética, diversidad de especies y diversidad de ecosistemas.' },
+          { heading:'Importancia y amenazas', body:'Una mayor biodiversidad aporta más estabilidad a los ecosistemas. Sus principales amenazas son la pérdida de hábitat, la contaminación, las especies invasoras y el cambio climático.' }
+        ],
+        qs:[
+          {type:'mc', q:'La biodiversidad se puede medir a nivel de genes, especies y...', opts:['Individuos','Ecosistemas','Órganos','Moléculas'], a:1},
+          {type:'tf', q:'La pérdida de hábitat es una de las principales causas de pérdida de biodiversidad.', a:true, explain:'Es, junto con la contaminación y el cambio climático, una de las principales amenazas.'},
+          {type:'mc', q:'Una especie que no es nativa de un ecosistema y afecta negativamente a las especies locales se llama especie...', opts:['Endémica','Invasora','Nativa','Extinta'], a:1},
+          {type:'tf', q:'Cuantas más especies distintas hay en un ecosistema, mayor es su biodiversidad.', a:true, explain:'La diversidad de especies es uno de los niveles en que se mide la biodiversidad.'},
+          {type:'tf', q:'La biodiversidad no tiene relación con la estabilidad de los ecosistemas.', a:false, explain:'Al contrario: una mayor biodiversidad aporta más estabilidad a los ecosistemas.'},
+          {type:'fill', q:'La pérdida de ___ es una de las principales amenazas a la biodiversidad.', opts:['hábitat','agua','luz solar','minerales'], a:0},
+          {type:'match', q:'Relacioná cada nivel o amenaza con su descripción.', pairs:[
+            ['Diversidad genética','Variedad de genes dentro de una especie'],
+            ['Diversidad de especies','Variedad de especies en un lugar'],
+            ['Diversidad de ecosistemas','Variedad de ecosistemas en una región'],
+            ['Especie invasora','Amenaza la biodiversidad local']
+          ]},
+        ]
+      },
+      { title:'Evidencias de la evolución',
+        teach:[
+          { heading:'El registro fósil', body:'Los fósiles muestran cambios graduales en las especies a lo largo del tiempo geológico, permitiendo reconstruir el árbol de la vida y ubicar temporalmente la aparición de distintos grupos.' },
+          { heading:'Anatomía comparada', body:'Compara estructuras entre especies. Los órganos <b>homólogos</b> tienen el mismo origen evolutivo aunque cumplan funciones distintas (el brazo humano y el ala de un murciélago); los <b>análogos</b> cumplen la misma función pero tienen origen distinto (el ala de un insecto y el ala de un ave).' },
+          { heading:'Otras evidencias', body:'La embriología comparada muestra similitudes entre embriones de especies emparentadas en etapas tempranas; la biogeografía estudia la distribución geográfica de las especies; la biología molecular compara secuencias de ADN entre especies para estimar su parentesco evolutivo.' }
+        ],
+        qs:[
+          {type:'mc', q:'Los órganos con el mismo origen evolutivo, aunque cumplan funciones distintas, se llaman...', opts:['Análogos','Homólogos','Vestigiales','Idénticos'], a:1},
+          {type:'mc', q:'El ala de un insecto y el ala de un ave son un ejemplo de órganos...', opts:['Homólogos','Análogos','Vestigiales','Idénticos'], a:1},
+          {type:'tf', q:'El registro fósil permite observar cambios graduales en las especies a lo largo del tiempo.', a:true, explain:'Es una de las principales evidencias de la evolución.'},
+          {type:'mc', q:'La disciplina que estudia la distribución geográfica de las especies como evidencia de la evolución es la...', opts:['Embriología comparada','Biogeografía','Anatomía comparada','Genética'], a:1},
+          {type:'tf', q:'El brazo humano y el ala de un murciélago son órganos análogos.', a:false, explain:'Son homólogos: tienen el mismo origen evolutivo aunque cumplan funciones distintas.'},
+          {type:'fill', q:'Los órganos que cumplen la misma función pero tienen origen evolutivo distinto se llaman ___.', opts:['análogos','homólogos','vestigiales','idénticos'], a:0},
+          {type:'match', q:'Relacioná cada tipo de evidencia con su descripción.', pairs:[
+            ['Órganos homólogos','Mismo origen, distinta función'],
+            ['Órganos análogos','Distinto origen, misma función'],
+            ['Registro fósil','Muestra cambios graduales en el tiempo'],
+            ['Biogeografía','Estudia la distribución geográfica de especies']
+          ]},
+        ]
+      },
+      { title:'Especiación',
+        teach:[
+          { heading:'¿Qué es una especie?', body:'Es un conjunto de poblaciones cuyos individuos pueden reproducirse entre sí y generar descendencia fértil. El <b>aislamiento reproductivo</b> impide el flujo génico entre dos poblaciones, permitiendo que diverjan hasta convertirse en especies distintas.' },
+          { heading:'Especiación alopátrica', body:'Ocurre cuando una barrera geográfica (una montaña, un río, un océano) separa físicamente a dos poblaciones, que evolucionan de forma independiente hasta volverse especies distintas.' },
+          { heading:'Especiación simpátrica', body:'Ocurre sin separación geográfica, dentro de la misma área; puede deberse a aislamiento reproductivo por diferencias de comportamiento, época de reproducción, o cambios cromosómicos bruscos.' }
+        ],
+        qs:[
+          {type:'mc', q:'Un conjunto de poblaciones cuyos individuos pueden reproducirse entre sí y generar descendencia fértil se llama...', opts:['Comunidad','Especie','Ecosistema','Bioma'], a:1},
+          {type:'mc', q:'La especiación que ocurre por una barrera geográfica que separa poblaciones se llama...', opts:['Simpátrica','Alopátrica','Artificial','Convergente'], a:1},
+          {type:'tf', q:'La especiación simpátrica ocurre sin separación geográfica entre las poblaciones.', a:true, explain:'Puede deberse a diferencias de comportamiento o cambios cromosómicos, sin barrera física.'},
+          {type:'mc', q:'El proceso que impide el flujo génico entre dos poblaciones se llama...', opts:['Flujo génico','Aislamiento reproductivo','Selección natural','Mutación'], a:1},
+          {type:'tf', q:'Una montaña o un río pueden actuar como barreras geográficas en la especiación alopátrica.', a:true, explain:'Estas barreras separan físicamente a las poblaciones, permitiendo que diverjan.'},
+          {type:'fill', q:'La especiación causada por una barrera geográfica se llama especiación ___.', opts:['alopátrica','simpátrica','artificial','convergente'], a:0},
+          {type:'match', q:'Relacioná cada concepto con su definición.', pairs:[
+            ['Especie','Poblaciones que se reproducen y generan descendencia fértil'],
+            ['Especiación alopátrica','Causada por separación geográfica'],
+            ['Especiación simpátrica','Ocurre sin separación geográfica'],
+            ['Aislamiento reproductivo','Impide el flujo génico entre poblaciones']
+          ]},
+        ]
+      },
+    ]
+  },
+  {
+    id:'ecologia', title:'Ecología', sub:'Ecosistemas y relaciones', theme:'sky', icon:'web',
+    levels:[
+      { title:'Ecosistemas y niveles de organización',
+        teach:[
+          { heading:'¿Qué es un ecosistema?', body:'Es el conjunto formado por los seres vivos de un lugar (<b>biocenosis</b>) y el ambiente físico donde interactúan (<b>biotopo</b>).' },
+          { heading:'Niveles de organización en la biosfera', body:'Van desde el individuo, pasando por la <b>población</b> (individuos de la misma especie en un área) y la <b>comunidad</b> (todas las poblaciones que interactúan), hasta el ecosistema y la biosfera.' },
+          { heading:'Ecosistemas artificiales', body:'Son creados o modificados por el ser humano, como los cultivos, las represas o los acuarios — a diferencia de los ecosistemas naturales.' }
+        ],
+        qs:[
+          {type:'mc', q:'El conjunto de seres vivos de un ecosistema se llama...', opts:['Biotopo','Biocenosis','Biósfera','Biomasa'], a:1},
+          {type:'mc', q:'El ambiente físico donde vive una comunidad se llama...', opts:['Biocenosis','Biotopo','Población','Bioma'], a:1},
+          {type:'mc', q:'El nivel formado por individuos de la misma especie en un área se llama...', opts:['Comunidad','Población','Ecosistema','Biosfera'], a:1},
+          {type:'mc', q:'El nivel que agrupa a todas las poblaciones que interactúan en un área se llama...', opts:['Individuo','Comunidad','Biotopo','Bioma'], a:1},
+          {type:'tf', q:'Un cultivo agrícola es un ejemplo de ecosistema artificial.', a:true, explain:'Es un ecosistema modificado o creado por el ser humano.'},
+          {type:'fill', q:'El conjunto de seres vivos y el ambiente físico donde interactúan forman un ___.', opts:['ecosistema','bioma','individuo','hábitat'], a:0},
+          {type:'match', q:'Relacioná cada nivel de organización con su definición.', pairs:[
+            ['Biocenosis','Conjunto de seres vivos'],
+            ['Biotopo','Ambiente físico'],
+            ['Población','Individuos de la misma especie'],
+            ['Comunidad','Todas las poblaciones que interactúan']
+          ]},
+        ]
+      },
+      { title:'Relaciones entre seres vivos',
+        teach:[
+          { heading:'Relaciones intraespecíficas', body:'Ocurren entre individuos de la misma especie: competencia por recursos, cooperación, gregarismo (vivir en grupo).' },
+          { heading:'Relaciones interespecíficas', body:'Ocurren entre especies distintas.', bullets:[
+            '<b>Depredación:</b> una especie caza y se alimenta de otra.',
+            '<b>Parasitismo:</b> una especie vive a expensas de otra, perjudicándola.',
+            '<b>Mutualismo:</b> ambas especies se benefician.',
+            '<b>Comensalismo:</b> una se beneficia y la otra no es afectada.'
+          ]}
+        ],
+        qs:[
+          {type:'mc', q:'La relación entre individuos de la misma especie se llama...', opts:['Interespecífica','Intraespecífica','Trófica','Simbiótica'], a:1},
+          {type:'mc', q:'La relación entre un león y una cebra es de tipo...', opts:['Mutualismo','Comensalismo','Depredación','Competencia intraespecífica'], a:2},
+          {type:'mc', q:'Una relación donde ambas especies se benefician se llama...', opts:['Parasitismo','Mutualismo','Depredación','Comensalismo'], a:1},
+          {type:'mc', q:'Una relación donde una especie se beneficia y la otra no se ve afectada se llama...', opts:['Comensalismo','Mutualismo','Parasitismo','Depredación'], a:0},
+          {type:'tf', q:'El parasitismo es un tipo de relación intraespecífica.', a:false, explain:'El parasitismo ocurre entre especies distintas: es una relación interespecífica.'},
+          {type:'fill', q:'La relación en la que ambas especies se benefician se llama ___.', opts:['mutualismo','parasitismo','comensalismo','depredación'], a:0},
+          {type:'match', q:'Relacioná cada relación con su definición.', pairs:[
+            ['Depredación','Una especie caza a otra'],
+            ['Mutualismo','Ambas especies se benefician'],
+            ['Comensalismo','Una se beneficia, la otra no es afectada'],
+            ['Parasitismo','Una especie perjudica a otra']
+          ]},
+        ]
+      },
+      { title:'Cadenas alimentarias y flujo de energía',
+        teach:[
+          { heading:'Cadenas y redes tróficas', body:'Una <b>cadena alimentaria</b> es la secuencia productor → consumidores → descomponedores. Cuando varias cadenas se interconectan, forman una <b>red o trama trófica</b>.' },
+          { heading:'Ciclo de la materia y flujo de energía', body:'La materia se recicla constantemente entre los seres vivos y el ambiente. La energía, en cambio, fluye de forma unidireccional a través de la cadena y se va perdiendo como calor en cada nivel.' }
+        ],
+        qs:[
+          {type:'mc', q:'Los organismos que producen su propio alimento en una cadena son los...', opts:['Consumidores','Productores','Descomponedores','Depredadores'], a:1},
+          {type:'mc', q:'Los organismos que descomponen la materia orgánica muerta son los...', opts:['Productores','Consumidores primarios','Descomponedores','Depredadores'], a:2},
+          {type:'tf', q:'La energía fluye de forma unidireccional a través de una cadena alimentaria.', a:true, explain:'A diferencia de la materia, que se recicla, la energía fluye en una sola dirección y se pierde como calor.'},
+          {type:'mc', q:'Un conjunto de cadenas alimentarias interconectadas se llama...', opts:['Biotopo','Red o trama trófica','Población','Biocenosis'], a:1},
+          {type:'tf', q:'La materia se recicla en los ecosistemas, mientras que la energía se pierde como calor.', a:true, explain:'Este es el principio central del ciclo de la materia y el flujo de energía.'},
+          {type:'fill', q:'La energía en una cadena alimentaria fluye de forma ___, y se pierde como calor en cada nivel.', opts:['unidireccional','cíclica','bidireccional','aleatoria'], a:0},
+          {type:'match', q:'Relacioná cada concepto trófico con su definición.', pairs:[
+            ['Productores','Producen su propio alimento'],
+            ['Descomponedores','Descomponen materia orgánica muerta'],
+            ['Materia','Se recicla en el ecosistema'],
+            ['Energía','Fluye en una sola dirección']
+          ]},
+        ]
+      },
+      { title:'Ciclos biogeoquímicos',
+        teach:[
+          { heading:'¿Qué son?', body:'Son los circuitos por los que la materia (elementos como carbono, nitrógeno, agua) circula entre los seres vivos y el ambiente físico, siendo reutilizada una y otra vez.' },
+          { heading:'Ciclo del carbono', body:'El carbono entra a los seres vivos por la fotosíntesis (fijación del CO₂), pasa a través de la cadena alimentaria y vuelve a la atmósfera por la respiración celular y la descomposición; también se almacena a largo plazo en combustibles fósiles.' },
+          { heading:'Ciclo del nitrógeno', body:'El nitrógeno atmosférico es fijado por bacterias fijadoras (que lo transforman en compuestos que las plantas pueden absorber); circula por la cadena alimentaria y vuelve a la atmósfera mediante bacterias desnitrificantes.' }
+        ],
+        qs:[
+          {type:'mc', q:'Los circuitos por los que la materia circula entre los seres vivos y el ambiente se llaman ciclos...', opts:['Tróficos','Biogeoquímicos','Reproductivos','Energéticos'], a:1},
+          {type:'mc', q:'El carbono ingresa a los seres vivos principalmente a través de la...', opts:['Respiración','Fotosíntesis','Excreción','Descomposición'], a:1},
+          {type:'tf', q:'El carbono almacenado en combustibles fósiles no forma parte del ciclo del carbono.', a:false, explain:'Sí forma parte del ciclo: es carbono almacenado a largo plazo.'},
+          {type:'mc', q:'Las bacterias que transforman el nitrógeno atmosférico en compuestos aprovechables por las plantas se llaman bacterias...', opts:['Desnitrificantes','Fijadoras','Descomponedoras','Fotosintéticas'], a:1},
+          {type:'tf', q:'A diferencia de la energía, la materia se recicla en los ciclos biogeoquímicos.', a:true, explain:'Es el principio central que distingue el ciclo de la materia del flujo de energía.'},
+          {type:'fill', q:'El ciclo que describe cómo circula el nitrógeno entre la atmósfera y los seres vivos es el ciclo del ___.', opts:['nitrógeno','carbono','agua','oxígeno'], a:0},
+          {type:'match', q:'Relacioná cada concepto con su descripción.', pairs:[
+            ['Ciclos biogeoquímicos','Circuitos de materia entre seres vivos y ambiente'],
+            ['Ciclo del carbono','El CO₂ se fija por fotosíntesis'],
+            ['Bacterias fijadoras','Transforman nitrógeno atmosférico'],
+            ['Bacterias desnitrificantes','Devuelven nitrógeno a la atmósfera']
+          ]},
+        ]
+      },
+      { title:'Impacto humano y conservación',
+        teach:[
+          { heading:'Principales impactos humanos', bullets:[
+            'Deforestación: pérdida de hábitats naturales.',
+            'Contaminación del agua, el aire y el suelo.',
+            'Introducción de especies exóticas o invasoras.',
+            'Sobreexplotación de recursos pesqueros y forestales.',
+            'Cambio climático por emisión de gases de efecto invernadero.'
+          ] },
+          { heading:'Áreas protegidas', body:'Son espacios delimitados para conservar la biodiversidad y los ecosistemas, restringiendo o regulando las actividades humanas dentro de ellos, como los parques nacionales y las reservas naturales.' },
+          { heading:'Conservación y uso sustentable', body:'Combina la protección del ambiente con el uso racional de los recursos, buscando que las actividades humanas no comprometan la capacidad de los ecosistemas de regenerarse.' }
+        ],
+        qs:[
+          {type:'mc', q:'La pérdida de bosques por la actividad humana se llama...', opts:['Reforestación','Deforestación','Fotosíntesis','Sucesión'], a:1},
+          {type:'mc', q:'Un espacio delimitado para conservar la biodiversidad, con actividades humanas reguladas, se llama...', opts:['Ecosistema artificial','Área protegida','Bioma','Hábitat urbano'], a:1},
+          {type:'tf', q:'La introducción de especies exóticas nunca afecta negativamente a los ecosistemas locales.', a:false, explain:'Pueden convertirse en especies invasoras y desplazar a las especies nativas.'},
+          {type:'mc', q:'El cambio climático se relaciona principalmente con la emisión de gases de...', opts:['Efecto invernadero','Ozono puro','Nitrógeno puro','Oxígeno'], a:0},
+          {type:'tf', q:'La conservación busca un uso racional de los recursos, sin comprometer la capacidad de regeneración de los ecosistemas.', a:true, explain:'Ese es el principio central de la conservación y el uso sustentable.'},
+          {type:'fill', q:'Los parques nacionales y las reservas naturales son ejemplos de ___ que protegen la biodiversidad.', opts:['áreas protegidas','ecosistemas artificiales','biomas','cadenas tróficas'], a:0},
+          {type:'match', q:'Relacioná cada concepto con su descripción.', pairs:[
+            ['Deforestación','Pérdida de bosques por acción humana'],
+            ['Área protegida','Espacio destinado a conservar la biodiversidad'],
+            ['Especie invasora','Afecta negativamente a especies nativas'],
+            ['Cambio climático','Relacionado con gases de efecto invernadero']
+          ]},
+        ]
+      },
+    ]
+  },
+];
+
+const THEME = {
+  leaf:   { grad:'linear-gradient(135deg,#3B9463,#1F5C37)' },
+  violet: { grad:'linear-gradient(135deg,#7E5FBB,#4E3577)' },
+  coral:  { grad:'linear-gradient(135deg,#EA7248,#B33F1E)' },
+  amber:  { grad:'linear-gradient(135deg,#D9A53C,#8F6212)' },
+  teal:   { grad:'linear-gradient(135deg,#279C87,#125349)' },
+  plum:   { grad:'linear-gradient(135deg,#A85F84,#63304A)' },
+  sky:    { grad:'linear-gradient(135deg,#4A8FC7,#1F4E78)' },
+};
+
+const ICONS = {
+  dna: '<path d="M7 3c0 6 10 6 10 12 0 3-3 5-3 5"/><path d="M17 21c0-6-10-6-10-12 0-3 3-5 3-5"/><path d="M8 6h8"/><path d="M8 18h8"/><path d="M7.5 10h9"/><path d="M7.5 14h9"/>',
+  heart:'<path d="M12 20s-7-4.4-9.5-9C.8 7.3 3 4 6.3 4 8.6 4 10.6 5.3 12 7.2 13.4 5.3 15.4 4 17.7 4 21 4 23.2 7.3 21.5 11c-2.5 4.6-9.5 9-9.5 9z"/>',
+  flask:'<path d="M9 2v6.5L4 18a2 2 0 0 0 1.8 3h12.4a2 2 0 0 0 1.8-3l-5-9.5V2"/><path d="M8.5 2h7"/><path d="M6.5 15h11"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  branch:'<path d="M12 21V9"/><path d="M12 9c0-3 2.5-4 4.5-6"/><path d="M12 13c0-2.5-2-3.5-4-5.5"/><path d="M12 9c0-4-1.5-5.5-2.5-7"/><circle cx="16.7" cy="2.7" r="1.4"/><circle cx="8.3" cy="3.3" r="1.4"/><circle cx="8.2" cy="7.6" r="1.4"/>',
+  web:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="14" r="2"/><circle cx="19" cy="14" r="2"/><circle cx="12" cy="20" r="2"/><path d="M12 7v0M6.4 12.6 10.5 6.9M17.6 12.6 13.5 6.9M6.7 15.8 10.5 18.7M17.3 15.8 13.5 18.7M7 14h10"/>',
+  bolt:'<path d="M13 2 3 14h7l-1 8 11-14h-7l0-6z"/>'
+};
+
+const CORRECT_MSGS = ['¡Correcto!','¡Excelente!','¡Genial!','¡Muy bien!','¡Perfecto!','¡Así se hace!'];
+
+/* ---------------------------- ESTADO ---------------------------- */
+const MAX_HEARTS = 5;
+let state = {
+  screen: 'home',          // home | teach | lesson | practice | summary | practiceSummary | gameover
+  unitIdx: 0,
+  levelIdx: 0,
+  qIndex: 0,
+  hearts: MAX_HEARTS,
+  xp: 0,
+  streak: 0,
+  completed: {},            // "unitIdx-levelIdx": true
+  selected: null,
+  answered: false,
+  sessionCorrect: 0,
+  combo: 0,
+  feedbackMsg: '',
+  match: null,              // { terms, defs, matched:Set, selTerm, selDef, wrongPair, total }
+  practicePool: [],
+  practiceUnit: null,       // for labeling questions during practice
+};
+
+function isLevelUnlocked(u, l){
+  if (u===0 && l===0) return true;
+  if (l===0){
+    const prevUnit = UNITS[u-1];
+    return !!state.completed[`${u-1}-${prevUnit.levels.length-1}`];
+  }
+  return !!state.completed[`${u}-${l-1}`];
+}
+function isLevelDone(u,l){ return !!state.completed[`${u}-${l}`]; }
+function hasAnyCompleted(){ return Object.keys(state.completed).length > 0; }
+
+function shuffleArr(arr){
+  const a = arr.slice();
+  for (let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+/* ---------------------------- RENDER ---------------------------- */
+const app = document.getElementById('app');
+
+function render(){
+  if (state.screen==='home') renderHome();
+  else if (state.screen==='teach') renderTeach();
+  else if (state.screen==='lesson' || state.screen==='practice') renderQuizScreen();
+  else if (state.screen==='summary') renderSummary();
+  else if (state.screen==='practiceSummary') renderPracticeSummary();
+  else if (state.screen==='gameover') renderGameOver();
+}
+
+function heartIconSvg(){
+  return `<svg viewBox="0 0 24 24" fill="var(--coral)" stroke="none"><path d="M12 20s-7-4.4-9.5-9C.8 7.3 3 4 6.3 4 8.6 4 10.6 5.3 12 7.2 13.4 5.3 15.4 4 17.7 4 21 4 23.2 7.3 21.5 11c-2.5 4.6-9.5 9-9.5 9z"/></svg>`;
+}
+
+function topBar(){
+  return `
+  <div class="topbar">
+    <div class="stat" style="color:var(--coral-dark)">${heartIconSvg()}${state.hearts}</div>
+    <div class="stat mono" style="color:var(--amber-dark)">
+      <svg viewBox="0 0 24 24" fill="var(--amber)" stroke="none">${ICONS.bolt}</svg>
+      ${state.xp}
+    </div>
+    <div class="stat" style="color:var(--leaf-dark)">
+      <svg viewBox="0 0 24 24" fill="var(--leaf)" stroke="none"><path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c1 2 1 4-.5 5.5A6 6 0 0 1 4 12c0-4 3-6 3-9 2 1 3 2 3 3 0-1.5.6-3 2-4z"/></svg>
+      ${state.streak}
+    </div>
+  </div>`;
+}
+
+function renderHome(){
+  let html = topBar();
+  html += `<div class="home-header">
+    <div class="eyebrow">BioQuest</div>
+    <h1>Explorá la Biología</h1>
+    <p class="lead">Un sendero con lo que vimos en la cursada: método científico, célula, fotosíntesis, fisiología animal, el planeta Tierra, evolución y ecología.</p>
+  </div>`;
+
+  if (hasAnyCompleted()){
+    html += `<div class="practice-card">
+      <div class="icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg></div>
+      <div class="txt"><h3>Modo Repaso</h3><p>Practicá por repetición todo lo que ya aprendiste. Sin corazones, sin límite.</p></div>
+      <button onclick="startPractice()">Repasar</button>
+    </div>`;
+  } else {
+    html += `<div class="practice-locked">Completá tu primera lección para desbloquear el <b>Modo Repaso</b> 🔁</div>`;
+  }
+
+  UNITS.forEach((unit, u)=>{
+    const t = THEME[unit.theme];
+    html += `<div class="unit-block">
+      <div class="unit-header" style="background:${t.grad}">
+        <div><h2>${unit.title}</h2><div class="unit-sub">${unit.sub}</div></div>
+      </div>
+      <div class="path">`;
+    unit.levels.forEach((lvl, l)=>{
+      const unlocked = isLevelUnlocked(u,l);
+      const done = isLevelDone(u,l);
+      const isCurrent = unlocked && !done;
+      const rowClass = l%3===1 ? 'offset-right' : (l%3===2 ? 'offset-left' : '');
+      html += `<div class="node-row ${rowClass}">
+        <div class="node ${unlocked?'':'locked'} ${isCurrent?'current':''}">
+          <button class="hex" style="background:${unlocked?t.grad:''}" ${unlocked?`onclick="goToLevel(${u},${l})"`:'disabled'} aria-label="${lvl.title}${done?' (completado)':unlocked?'':' (bloqueado)'}">
+            ${unlocked
+              ? `<svg class="icon" viewBox="0 0 24 24">${ICONS[unit.icon]}</svg>`
+              : `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`
+            }
+            ${done ? `<span class="check"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>` : ''}
+          </button>
+          <div class="node-label">${lvl.title}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  app.innerHTML = html;
+}
+
+function goToLevel(u,l){
+  state.unitIdx = u; state.levelIdx = l;
+  state.screen = 'teach';
+  render();
+}
+
+function currentLevel(){ return UNITS[state.unitIdx].levels[state.levelIdx]; }
+
+/* Which set of questions is active right now, depending on screen */
+function activeQuestions(){
+  return state.screen==='practice' ? state.practicePool : currentLevel().qs;
+}
+
+/* ---------------------------- TEACH SCREEN ---------------------------- */
+function renderTeach(){
+  const lvl = currentLevel();
+  let html = `<div class="lesson-header">
+    <button class="exit-btn" onclick="exitLesson()" aria-label="Salir">✕</button>
+    <div class="teach-heading-line">${UNITS[state.unitIdx].title} · ${lvl.title}</div>
+  </div>`;
+
+  html += `<div class="teach-wrap">
+    <div class="q-kicker">Aprendé antes de practicar</div>
+    <h2 class="teach-title">${lvl.title}</h2>`;
+
+  lvl.teach.forEach(block=>{
+    html += `<div class="concept">
+      <h3>${block.heading}</h3>
+      <p>${block.body}</p>
+      ${block.bullets ? `<ul>${block.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
+    </div>`;
+  });
+
+  html += `</div>
+  <div class="action-bar">
+    <button class="btn-primary ready" onclick="beginQuiz()">Empezar preguntas →</button>
+  </div>`;
+
+  app.innerHTML = html;
+}
+
+function resetQuizState(){
+  state.qIndex = 0; state.hearts = MAX_HEARTS;
+  state.selected = null; state.answered = false; state.sessionCorrect = 0;
+  state.combo = 0; state.feedbackMsg = ''; state.match = null;
+}
+
+function beginQuiz(){
+  resetQuizState();
+  state.screen = 'lesson';
+  render();
+}
+
+/* ---------------------------- PRACTICE MODE ---------------------------- */
+function startPractice(){
+  let pool = [];
+  Object.keys(state.completed).forEach(key=>{
+    const [u,l] = key.split('-').map(Number);
+    const lvl = UNITS[u].levels[l];
+    lvl.qs.forEach(q=>{
+      pool.push(Object.assign({}, q, { _unit: UNITS[u].title, _level: lvl.title }));
+    });
+  });
+  pool = shuffleArr(pool).slice(0, Math.min(12, pool.length));
+  state.practicePool = pool;
+  resetQuizState();
+  state.hearts = MAX_HEARTS; // shown but not spent in practice
+  state.screen = 'practice';
+  render();
+}
+
+/* ---------------------------- MATCH (RELACIONAR) LOGIC ---------------------------- */
+function initMatch(q){
+  const terms = shuffleArr(q.pairs.map((p,i)=>({text:p[0], idx:i})));
+  const defs = shuffleArr(q.pairs.map((p,i)=>({text:p[1], idx:i})));
+  state.match = { terms, defs, matched:new Set(), selTerm:null, selDef:null, wrongPair:null, total:q.pairs.length };
+}
+
+function selectMatchTerm(idx){
+  if (!state.match || state.match.matched.has(idx)) return;
+  state.match.selTerm = idx; state.match.wrongPair = null;
+  tryMatch();
+  render();
+}
+function selectMatchDef(idx){
+  if (!state.match || state.match.matched.has(idx)) return;
+  state.match.selDef = idx; state.match.wrongPair = null;
+  tryMatch();
+  render();
+}
+function tryMatch(){
+  const m = state.match;
+  if (m.selTerm===null || m.selDef===null) return;
+  if (m.selTerm === m.selDef){
+    m.matched.add(m.selTerm);
+    m.selTerm = null; m.selDef = null;
+    state.xp += 3; Store.set('xp', state.xp);
+    if (m.matched.size >= m.total){
+      state.answered = true;
+      state.sessionCorrect += 1;
+      incrementCombo();
+      state.feedbackMsg = CORRECT_MSGS[Math.floor(Math.random()*CORRECT_MSGS.length)];
+    }
+  } else {
+    m.wrongPair = { term:m.selTerm, def:m.selDef };
+    m.selTerm = null; m.selDef = null;
+    resetCombo();
+    setTimeout(()=>{ if (state.match){ state.match.wrongPair = null; render(); } }, 450);
+  }
+}
+
+function incrementCombo(){ state.combo += 1; }
+function resetCombo(){ state.combo = 0; }
+
+/* ---------------------------- QUIZ SCREEN (lesson & practice) ---------------------------- */
+function formatQText(text){
+  return text.replace('___', '<span class="blank">___</span>');
+}
+
+function renderQuizScreen(){
+  const practice = state.screen==='practice';
+  const qs = activeQuestions();
+  const q = qs[state.qIndex];
+  const pct = Math.round((state.qIndex/qs.length)*100);
+  const lvl = practice ? null : currentLevel();
+
+  let html = `<div class="lesson-header">
+    <button class="exit-btn" onclick="exitLesson()" aria-label="Salir">✕</button>
+    <div class="progress-track"><div class="progress-fill ${practice?'practice-fill':''}" style="width:${pct}%"></div></div>
+    ${practice
+      ? `<div class="hearts-mini" style="color:var(--violet-dark)">🔁 ${state.qIndex+1}/${qs.length}</div>`
+      : `<div class="hearts-mini">${heartIconSvg()}${state.hearts}</div>`
+    }
+    ${state.combo>=2 ? `<div class="combo-badge">🔥 ${state.combo}</div>` : ''}
+  </div>`;
+
+  html += `<div class="question-wrap">
+    <div class="q-kicker">${practice ? (q._unit+' · '+q._level) : (UNITS[state.unitIdx].title+' · '+lvl.title)}</div>`;
+
+  if (q.type==='match'){
+    if (!state.match || (state.match.total !== q.pairs.length && !state.answered)) initMatch(q);
+    html += `<div class="q-text">${formatQText(q.q)}</div>
+      <div class="match-hint">Tocá un término y después su definición para relacionarlos.</div>
+      <div class="match-wrap">
+        <div class="match-col">${state.match.terms.map(t=>{
+          let cls='match-item';
+          if (state.match.matched.has(t.idx)) cls+=' matched';
+          else if (state.match.selTerm===t.idx) cls+=' selected';
+          else if (state.match.wrongPair && state.match.wrongPair.term===t.idx) cls+=' wrong';
+          return `<button class="${cls}" ${state.match.matched.has(t.idx)?'disabled':''} onclick="selectMatchTerm(${t.idx})">${t.text}</button>`;
+        }).join('')}</div>
+        <div class="match-col">${state.match.defs.map(d=>{
+          let cls='match-item';
+          if (state.match.matched.has(d.idx)) cls+=' matched';
+          else if (state.match.selDef===d.idx) cls+=' selected';
+          else if (state.match.wrongPair && state.match.wrongPair.def===d.idx) cls+=' wrong';
+          return `<button class="${cls}" ${state.match.matched.has(d.idx)?'disabled':''} onclick="selectMatchDef(${d.idx})">${d.text}</button>`;
+        }).join('')}</div>
+      </div>`;
+  } else {
+    if (q.type==='fill') html += `<div class="q-type-tag">Completá</div>`;
+    html += `<div class="q-text">${formatQText(q.q)}</div>`;
+    if (q.type==='mc' || q.type==='fill'){
+      html += `<div class="options">`;
+      q.opts.forEach((opt,i)=>{ html += optionHtml(i, opt, i===q.a); });
+      html += `</div>`;
+    } else {
+      html += `<div class="tf-row">
+        ${optionHtml(true, 'Verdadero', q.a===true)}
+        ${optionHtml(false, 'Falso', q.a===false)}
+      </div>`;
+    }
+  }
+  html += `</div>`;
+
+  html += actionBarHtml();
+  app.innerHTML = html;
+}
+
+function optionHtml(value, label, isCorrectValue){
+  const letters = {0:'A',1:'B',2:'C',3:'D', true:'V', false:'F'};
+  let cls = 'option';
+  let disabled = '';
+  if (state.answered){
+    disabled = 'disabled';
+    const selected = state.selected===value;
+    if (isCorrectValue) cls += ' correct';
+    else if (selected) cls += ' wrong';
+  } else if (state.selected===value){
+    cls += ' selected';
+  }
+  return `<button class="${cls}" ${disabled} onclick="selectOption(${JSON.stringify(value)})">
+    <span class="letter">${letters[value]}</span><span>${label}</span>
+  </button>`;
+}
+
+function selectOption(value){
+  if (state.answered) return;
+  state.selected = value;
+  render();
+}
+
+function actionBarHtml(){
+  const practice = state.screen==='practice';
+  const qs = activeQuestions();
+  const q = qs[state.qIndex];
+
+  if (q.type==='match'){
+    if (!state.answered){
+      return `<div class="action-bar"><button class="btn-primary" disabled>Relacioná todos los pares</button></div>`;
+    }
+    return `<div class="action-bar state-correct">
+      <div class="feedback-line correct">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> ${state.feedbackMsg||'¡Todo relacionado!'}
+        ${state.combo>=2 ? `<span class="mini-combo">🔥 Racha de ${state.combo}</span>` : ''}
+      </div>
+      <button class="btn-primary ready ${practice?'practice-state':''}" onclick="nextQuestion()">Continuar</button>
+    </div>`;
+  }
+
+  if (!state.answered){
+    const ready = state.selected!==null;
+    return `<div class="action-bar">
+      <button class="btn-primary ${ready?(practice?'ready practice-state':'ready'):''}" ${ready?'':'disabled'} onclick="checkAnswer()">Comprobar</button>
+    </div>`;
+  }
+  const correct = state.selected === q.a;
+  return `<div class="action-bar ${correct?'state-correct':'state-wrong'}">
+    <div class="feedback-line ${correct?'correct':'wrong'}">
+      ${correct
+        ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> ${state.feedbackMsg||'¡Correcto!'}`
+        : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg> Respuesta incorrecta`
+      }
+      ${correct && state.combo>=2 ? `<span class="mini-combo">🔥 Racha de ${state.combo}</span>` : ''}
+    </div>
+    ${q.explain ? `<p class="feedback-explain">${q.explain}</p>` : ''}
+    <button class="btn-primary ready ${correct?(practice?'practice-state':''):'wrong-state'}" onclick="nextQuestion()">Continuar</button>
+  </div>`;
+}
+
+function checkAnswer(){
+  if (state.selected===null || state.answered) return;
+  const practice = state.screen==='practice';
+  const qs = activeQuestions();
+  const q = qs[state.qIndex];
+  state.answered = true;
+  if (state.selected === q.a){
+    state.xp += practice ? 5 : 10;
+    Store.set('xp', state.xp);
+    state.sessionCorrect += 1;
+    incrementCombo();
+    state.feedbackMsg = CORRECT_MSGS[Math.floor(Math.random()*CORRECT_MSGS.length)];
+  } else {
+    resetCombo();
+    if (!practice) state.hearts -= 1;
+  }
+  render();
+
+  if (!practice && state.hearts <= 0){
+    setTimeout(()=>{ state.screen='gameover'; render(); }, 900);
+  }
+}
+
+function nextQuestion(){
+  const practice = state.screen==='practice';
+  const qs = activeQuestions();
+  if (!practice && state.hearts<=0) return;
+  state.qIndex += 1;
+  state.selected = null;
+  state.answered = false;
+  state.match = null;
+  state.feedbackMsg = '';
+
+  if (state.qIndex >= qs.length){
+    if (practice){
+      state.screen = 'practiceSummary';
+    } else {
+      const key = `${state.unitIdx}-${state.levelIdx}`;
+      if (!state.completed[key]){
+        state.completed[key] = true;
+        Store.set('completed', state.completed);
+        state.streak += 1;
+        Store.set('streak', state.streak);
+      }
+      state.screen = 'summary';
+    }
+  }
+  render();
+}
+
+function exitLesson(){
+  state.screen = 'home';
+  render();
+}
+
+function renderSummary(){
+  const lvl = currentLevel();
+  const total = lvl.qs.length;
+  app.innerHTML = `<div class="center-screen">
+    <svg class="badge" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="1.3">
+      <circle cx="12" cy="12" r="9" fill="var(--leaf-pale)"/>
+      <path d="M8 12.5l2.7 2.7L16 9.5" stroke="var(--leaf)" stroke-width="2"/>
+    </svg>
+    <h1>¡Lección completa!</h1>
+    <p>Terminaste "${lvl.title}" de ${UNITS[state.unitIdx].title}.</p>
+    <div class="summary-stats">
+      <div class="summary-stat"><div class="num">${state.sessionCorrect}/${total}</div><div class="lbl">Correctas</div></div>
+      <div class="summary-stat"><div class="num">+${state.sessionCorrect*10}</div><div class="lbl">XP ganado</div></div>
+      <div class="summary-stat"><div class="num">${state.streak}</div><div class="lbl">Racha</div></div>
+    </div>
+    <button class="wide-btn" onclick="backToHome()">Continuar</button>
+    <button class="wide-btn secondary" onclick="startPractice()">Repasar por repetición 🔁</button>
+  </div>`;
+}
+
+function renderPracticeSummary(){
+  const total = state.practicePool.length;
+  app.innerHTML = `<div class="center-screen">
+    <svg class="badge" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="1.3">
+      <circle cx="12" cy="12" r="9" fill="var(--violet-pale)"/>
+      <path d="M8 12.5l2.7 2.7L16 9.5" stroke="var(--violet)" stroke-width="2"/>
+    </svg>
+    <h1>¡Repaso completo!</h1>
+    <p>Repasaste ${total} preguntas de todo lo que ya aprendiste. La repetición es la clave para que no se te olvide.</p>
+    <div class="summary-stats">
+      <div class="summary-stat"><div class="num">${state.sessionCorrect}/${total}</div><div class="lbl">Correctas</div></div>
+      <div class="summary-stat"><div class="num">+${state.sessionCorrect*5}</div><div class="lbl">XP ganado</div></div>
+    </div>
+    <button class="wide-btn" onclick="startPractice()">Repasar de nuevo</button>
+    <button class="wide-btn secondary" onclick="backToHome()">Volver al mapa</button>
+  </div>`;
+}
+
+function renderGameOver(){
+  app.innerHTML = `<div class="center-screen">
+    <svg class="badge" viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="1.3">
+      <circle cx="12" cy="12" r="9" fill="var(--coral-pale)"/>
+      <path d="M9 9l6 6M15 9l-6 6" stroke="var(--coral)" stroke-width="2"/>
+    </svg>
+    <h1>Te quedaste sin vidas</h1>
+    <p>No pasa nada — repasá la lección "${currentLevel().title}" y volvé a intentarlo.</p>
+    <button class="wide-btn" onclick="retryLevel()">Reintentar lección</button>
+    <button class="wide-btn secondary" onclick="backToHome()">Volver al mapa</button>
+  </div>`;
+}
+
+function retryLevel(){
+  resetQuizState();
+  state.screen = 'lesson';
+  render();
+}
+
+function backToHome(){
+  state.screen = 'home';
+  render();
+}
+
+/* ---------------------------- INIT ---------------------------- */
+(async function init(){
+  await Store.load();
+  state.xp = Store.get('xp', 0);
+  state.streak = Store.get('streak', 0);
+  state.completed = Store.get('completed', {});
+  render();
+})();
+</script>
+</body>
+</html>
